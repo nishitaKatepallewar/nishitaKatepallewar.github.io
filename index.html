@@ -1,0 +1,993 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vexa — AI Quality Control for 3D Assets</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #181b1e;
+      --bg2: #22262b;
+      --bg3: #2a2f36;
+      --bg4: #323940;
+      --border: rgba(255,255,255,0.06);
+      --border-hi: rgba(255,255,255,0.12);
+      --text: #e8edf2;
+      --text-muted: rgba(232,237,242,0.5);
+      --text-dim: rgba(232,237,242,0.28);
+      --accent: #ea7600;
+      --accent-dim: #c46200;
+      --accent-glow: rgba(234,118,0,0.25);
+      --accent2: #3a8eff;
+      --accent2-dim: #2a6ecc;
+      --ai-glow: rgba(58,142,255,0.15);
+      --mono: 'DM Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      overflow-x: hidden;
+      cursor: crosshair;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* BACKGROUND EFFECTS */
+    .bg-gradient-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+      top: -200px; right: -100px;
+      animation: float1 20s ease-in-out infinite;
+    }
+    .orb-2 {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, var(--ai-glow) 0%, transparent 70%);
+      bottom: 20%; left: -150px;
+      animation: float2 25s ease-in-out infinite;
+    }
+    .orb-3 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(234,118,0,0.1) 0%, transparent 70%);
+      top: 40%; right: 20%;
+      animation: float3 18s ease-in-out infinite;
+    }
+
+    @keyframes float1 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(-50px, 50px) scale(1.1); }
+      66% { transform: translate(30px, -30px) scale(0.95); }
+    }
+    @keyframes float2 {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(80px, -40px) scale(1.05); }
+    }
+    @keyframes float3 {
+      0%, 100% { transform: translate(0, 0); opacity: 0.5; }
+      50% { transform: translate(-40px, 30px); opacity: 0.8; }
+    }
+
+    .grid-bg {
+      position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 48px;
+      background: linear-gradient(180deg, rgba(24,27,30,0.9) 0%, transparent 100%);
+      transition: all 0.3s ease;
+    }
+    nav.scrolled {
+      background: rgba(24,27,30,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-family: var(--sans);
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      position: relative;
+    }
+    .nav-logo span { color: var(--accent); }
+    .nav-logo::after {
+      content: '';
+      position: absolute;
+      width: 4px; height: 4px;
+      background: var(--accent);
+      border-radius: 50%;
+      right: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      box-shadow: 0 0 6px var(--accent-glow);
+    }
+    .nav-links {
+      display: flex; gap: 40px;
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em;
+      color: var(--text-dim);
+      list-style: none;
+    }
+    .nav-links a {
+      position: relative;
+      transition: color 0.2s ease;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 1px;
+      background: var(--accent);
+      transition: width 0.3s ease;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em;
+      padding: 12px 24px;
+      background: var(--accent); color: var(--bg);
+      border: none;
+      cursor: crosshair;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      position: relative;
+    }
+    .nav-cta::after {
+      content: '⌘V';
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 9px;
+      opacity: 0.4;
+      color: var(--bg);
+    }
+    .nav-cta:hover { 
+      background: var(--text); 
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(234,118,0,0.3);
+    }
+
+    /* HERO */
+    .hero {
+      position: relative; z-index: 1;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      padding: 140px 48px 80px;
+    }
+    .hero-eyebrow {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em;
+      color: var(--accent); text-transform: uppercase;
+      margin-bottom: 24px;
+      display: flex; align-items: center; gap: 16px;
+      animation: fadeSlideUp 0.8s ease forwards;
+      opacity: 0;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: inline-block; width: 40px; height: 1px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+    }
+    .hero-h1 {
+      font-size: clamp(56px, 8vw, 160px);
+      font-weight: 800;
+      line-height: 0.88;
+      letter-spacing: -0.04em;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+      max-width: 1200px;
+      animation: fadeSlideUp 0.8s ease forwards 0.15s;
+      opacity: 0;
+    }
+    .hero-h1 .line1 { color: var(--text); }
+    .hero-h1 .line2 { color: var(--text-dim); }
+    .hero-h1 .accent-word { 
+      color: var(--accent);
+      text-shadow: 0 0 60px var(--accent-glow);
+    }
+
+    .hero-desc {
+      font-family: var(--mono); font-size: 15px; line-height: 1.8;
+      color: var(--text-muted); max-width: 480px;
+      margin-bottom: 40px;
+      animation: fadeSlideUp 0.8s ease forwards 0.3s;
+      opacity: 0;
+    }
+
+    .hero-actions { 
+      display: flex; gap: 16px; align-items: center;
+      animation: fadeSlideUp 0.8s ease forwards 0.45s;
+      opacity: 0;
+    }
+    .btn-primary {
+      font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em;
+      padding: 16px 36px;
+      background: var(--accent); color: var(--bg);
+      border: none; cursor: crosshair;
+      transition: all 0.25s ease;
+      text-transform: uppercase;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 1px; height: 100%;
+      background: rgba(0,0,0,0.15);
+    }
+    .btn-primary::after {
+      content: '⌘';
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      opacity: 0.4;
+      color: var(--bg);
+    }
+    .btn-ghost::after {
+      content: '⌥';
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      opacity: 0.4;
+    }
+    .btn-primary::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.5s ease;
+    }
+    .btn-primary:hover { 
+      transform: translateY(-3px);
+      box-shadow: 0 12px 32px var(--accent-glow);
+    }
+    .btn-primary:hover::before { transform: translateX(100%); }
+    .btn-ghost {
+      font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em;
+      padding: 16px 36px;
+      background: transparent; color: var(--text-muted);
+      border: 1px solid var(--border-hi); cursor: crosshair;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+    }
+    .btn-ghost:hover { 
+      color: var(--text); 
+      border-color: var(--text);
+      background: rgba(255,255,255,0.03);
+    }
+
+    /* VIDEO SECTION - Demo First */
+    .demo-section {
+      position: relative; z-index: 1;
+      padding: 0 48px 100px;
+    }
+    .video-label {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em;
+      color: var(--text-dim); text-transform: uppercase;
+      margin-bottom: 24px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .video-label::before { 
+      content: ''; display: inline-block; width: 24px; height: 1px; 
+      background: var(--text-dim); 
+    }
+    .video-wrapper {
+      position: relative;
+      width: 100%;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      overflow: hidden;
+    }
+    .video-wrapper::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: 
+        radial-gradient(ellipse 80% 60% at 20% 30%, var(--accent-glow) 0%, transparent 50%),
+        radial-gradient(ellipse 60% 50% at 80% 70%, var(--ai-glow) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .video-wrapper::after {
+      content: '';
+      position: absolute; inset: 0;
+      border: 1px solid transparent;
+      border-image: linear-gradient(135deg, var(--accent), transparent 60%) 1;
+      pointer-events: none;
+    }
+
+    /* VIEWPORT CORNER BRACKETS - Blender style */
+    .viewport-corners {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .viewport-corners::before,
+    .viewport-corners::after {
+      content: '';
+      position: absolute;
+      width: 14px; height: 14px;
+      border-color: var(--accent);
+      border-style: solid;
+      opacity: 0.5;
+    }
+    .viewport-corners::before {
+      top: -1px; left: -1px;
+      border-width: 1px 0 0 1px;
+    }
+    .viewport-corners::after {
+      bottom: -1px; right: -1px;
+      border-width: 0 1px 1px 0;
+    }
+    .video-inner {
+      width: 100%; aspect-ratio: 16/9;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      position: relative; z-index: 1;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .video-inner:hover { background: var(--bg3); }
+    .play-btn {
+      width: 90px; height: 90px;
+      border: 1px solid var(--accent);
+      background: rgba(234,118,0,0.1);
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .play-btn::before {
+      content: '';
+      position: absolute; inset: -20px;
+      border: 1px solid rgba(234,118,0,0.2);
+      border-radius: 50%;
+      animation: pulse-ring 2s ease infinite;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.8); opacity: 1; }
+      100% { transform: scale(1.5); opacity: 0; }
+    }
+    .video-inner:hover .play-btn {
+      background: var(--accent);
+      transform: scale(1.1);
+    }
+    .play-btn svg { 
+      width: 24px; height: 24px; 
+      fill: var(--accent); margin-left: 4px; 
+      transition: fill 0.3s ease;
+    }
+    .video-inner:hover .play-btn svg { fill: var(--bg); }
+    .video-caption {
+      font-family: var(--mono); font-size: 12px; letter-spacing: 0.1em;
+      color: var(--text-dim); margin-top: 20px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .video-caption::before {
+      content: '>';
+      color: var(--accent);
+      font-weight: bold;
+    }
+    .video-caption::after {
+      content: '_';
+      color: var(--accent);
+      animation: blink 1s step-end infinite;
+    }
+
+    /* STATS */
+    .hero-stat-strip {
+      display: flex; gap: 0;
+      border: 1px solid var(--border);
+      margin-top: 60px;
+      animation: fadeSlideUp 0.8s ease forwards 0.6s;
+      opacity: 0;
+    }
+    .hero-stat {
+      flex: 1; padding: 28px 32px;
+      border-right: 1px solid var(--border);
+      position: relative;
+      transition: background 0.3s ease;
+    }
+    .hero-stat:hover { background: var(--bg2); }
+    .hero-stat:last-child { border-right: none; }
+    .stat-n {
+      font-size: 36px; font-weight: 800; display: block; margin-bottom: 6px;
+    }
+    .stat-n .unit { font-size: 18px; color: var(--accent); margin-left: 2px; }
+    .stat-label {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.12em;
+      color: var(--text-dim); text-transform: uppercase;
+    }
+
+    .section-divider {
+      border: none; border-top: 1px solid var(--border);
+      margin: 0 48px;
+    }
+
+    /* FEATURES */
+    .features-section {
+      position: relative; z-index: 1;
+      padding: 100px 48px;
+    }
+    .section-header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 60px; gap: 40px; flex-wrap: wrap;
+      position: relative;
+    }
+    .section-header::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--border) 50%, transparent 100%);
+    }
+    .section-tag {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em;
+      color: var(--accent); text-transform: uppercase;
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 16px;
+    }
+    .section-tag::before { 
+      content: ''; display: inline-block; width: 24px; height: 1px; 
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+    .section-title {
+      font-size: clamp(36px, 4vw, 56px); font-weight: 800;
+      letter-spacing: -0.03em; text-transform: uppercase;
+      line-height: 1.1;
+    }
+    .section-note {
+      font-family: var(--mono); font-size: 12px; color: var(--text-muted);
+      max-width: 280px; line-height: 1.7;
+      text-align: right;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: 1px solid var(--border);
+    }
+    .feature-card {
+      padding: 40px 36px;
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 16px; left: 16px;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--bg4);
+      transition: background 0.3s ease;
+    }
+    .feature-card::after {
+      content: '';
+      position: absolute;
+      left: 38px;
+      top: 18px;
+      width: 8px;
+      height: 1px;
+      background: var(--border);
+    }
+    .feature-card:hover::before { background: var(--accent); }
+    .feature-card:hover { 
+      background: var(--bg2);
+      transform: translateY(-4px);
+    }
+    .feature-card:nth-child(3n) { border-right: none; }
+    .feature-card:nth-child(n+4) { border-bottom: none; }
+    .feature-num {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em;
+      color: var(--text-dim); margin-bottom: 28px;
+      display: block;
+    }
+    .feature-icon {
+      width: 44px; height: 44px; margin-bottom: 20px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--border);
+      position: relative;
+    }
+    .feature-icon::before {
+      content: '';
+      position: absolute; top: -1px; left: 16px;
+      width: 6px; height: 6px;
+      background: var(--accent);
+    }
+    .feature-icon svg { 
+      width: 22px; height: 22px; 
+      stroke: var(--accent); fill: none; stroke-width: 1.5; 
+    }
+    .feature-name {
+      font-size: 15px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em; margin-bottom: 12px;
+    }
+    .feature-desc {
+      font-family: var(--mono); font-size: 12px; line-height: 1.7;
+      color: var(--text-muted);
+    }
+    .feature-accent-line {
+      position: absolute; bottom: 0; left: 0;
+      width: 0; height: 2px; background: var(--accent);
+      transition: width 0.4s ease;
+    }
+    .feature-card:hover .feature-accent-line { width: 100%; }
+
+    /* HOW IT WORKS */
+    .how-section {
+      position: relative; z-index: 1;
+      padding: 100px 48px;
+    }
+    .steps-row {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border: 1px solid var(--border);
+      margin-top: 60px;
+    }
+    .step {
+      padding: 40px 32px;
+      border-right: 1px solid var(--border);
+      position: relative;
+      transition: background 0.3s ease;
+    }
+    .step:hover { background: var(--bg2); }
+    .step:last-child { border-right: none; }
+    .step-num {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 0.15em;
+      color: var(--accent); margin-bottom: 20px; display: block;
+    }
+    .step-title {
+      font-size: 14px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.04em; margin-bottom: 12px;
+    }
+    .step-desc {
+      font-family: var(--mono); font-size: 12px; line-height: 1.7;
+      color: var(--text-muted);
+    }
+    .step-connector {
+      position: absolute; top: 44px; right: -5px;
+      width: 10px; height: 10px;
+      background: var(--accent);
+      transform: rotate(45deg) translateX(50%);
+      z-index: 2;
+    }
+    .step-connector::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 100%;
+      width: 40px; height: 1px;
+      background: linear-gradient(90deg, var(--accent), var(--border));
+    }
+    .step:last-child .step-connector { display: none; }
+
+    /* CTA */
+    .cta-section {
+      position: relative; z-index: 1;
+      padding: 100px 48px 80px;
+    }
+    .cta-box {
+      border: 1px solid var(--border);
+      padding: 100px 64px;
+      text-align: center;
+      position: relative; overflow: hidden;
+    }
+    .cta-box::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: 
+        radial-gradient(ellipse 60% 50% at 50% 100%, var(--accent-glow) 0%, transparent 60%),
+        radial-gradient(ellipse 40% 40% at 20% 20%, var(--ai-glow) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    .cta-box::after {
+      content: '';
+      position: absolute;
+      top: 16px; left: 16px; right: 16px; bottom: 16px;
+      border: 1px solid rgba(234,118,0,0.15);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .cta-box:hover::after { opacity: 1; }
+
+    /* VIEWPORT CORNER BRACKETS */
+    .cta-box .viewport-corners::before {
+      top: 15px; left: 15px;
+    }
+    .cta-box .viewport-corners::after {
+      bottom: 15px; right: 15px;
+    }
+    .cta-title {
+      font-size: clamp(48px, 6vw, 96px); font-weight: 800;
+      text-transform: uppercase; letter-spacing: -0.03em;
+      line-height: 1; margin-bottom: 24px; position: relative; z-index: 1;
+    }
+    .cta-title span { color: var(--accent); }
+    .cta-sub {
+      font-family: var(--mono); font-size: 14px; color: var(--text-muted);
+      margin-bottom: 40px; position: relative; z-index: 1;
+    }
+    .cta-actions { 
+      display: flex; gap: 16px; justify-content: center; 
+      position: relative; z-index: 1; 
+    }
+
+    /* FOOTER */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 32px 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 24px; flex-wrap: wrap;
+    }
+    .footer-logo { 
+      font-size: 14px; font-weight: 800; letter-spacing: 0.12em; 
+      text-transform: uppercase; 
+    }
+    .footer-logo span { color: var(--accent); }
+    .footer-links {
+      display: flex; gap: 32px;
+      font-family: var(--mono); font-size: 11px;
+      color: var(--text-dim); list-style: none;
+    }
+    .footer-links a:hover { color: var(--text-muted); }
+    .footer-copy {
+      font-family: var(--mono); font-size: 11px; color: var(--text-dim);
+    }
+
+    /* ANIMATIONS */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* CURSOR */
+    .cursor-dot {
+      position: fixed; width: 6px; height: 6px;
+      background: var(--accent); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+    .cursor-ring {
+      position: fixed; width: 40px; height: 40px;
+      border: 1px solid var(--accent); border-radius: 50%;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%, -50%);
+      opacity: 0.3;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+
+    /* SCROLL REVEAL */
+    .reveal { 
+      opacity: 0; transform: translateY(30px); 
+      transition: opacity 0.6s ease, transform 0.6s ease; 
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .hero { padding: 120px 24px 60px; }
+      .hero-stat-strip { flex-direction: column; }
+      .hero-stat { border-right: none; border-bottom: 1px solid var(--border); }
+      .features-grid { grid-template-columns: 1fr; }
+      .feature-card { border-right: none; }
+      .feature-card:nth-child(n) { border-bottom: 1px solid var(--border); }
+      .steps-row { grid-template-columns: 1fr 1fr; }
+      .step { border-right: 1px solid var(--border); }
+      .step:nth-child(2n) { border-right: none; }
+      .demo-section, .features-section, .how-section, .cta-section, footer,
+      .section-divider, .hero-stat-strip { padding-left: 24px; padding-right: 24px; }
+      .cta-box { padding: 60px 32px; }
+      .hero-bottom { flex-direction: column; align-items: flex-start; }
+      .hero-actions { margin-top: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Background effects -->
+<div class="bg-gradient-orb orb-1"></div>
+<div class="bg-gradient-orb orb-2"></div>
+<div class="bg-gradient-orb orb-3"></div>
+<div class="grid-bg"></div>
+
+<!-- Cursor -->
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav id="mainNav">
+  <div class="nav-logo">Vex<span>A</span></div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#demo">Demo</a></li>
+  </ul>
+  <a href="#cta" class="nav-cta">Get add-on</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow">Blender Add-on</div>
+  <h1 class="hero-h1">
+    <span class="line1">Quality</span><br>
+    <span class="line2">Control,</span><br>
+    <span class="accent-word">Automated.</span>
+  </h1>
+  <p class="hero-desc">
+    Vexa is an AI-powered Blender add-on that runs exhaustive quality checks on your 3D game assets — topology, UVs, naming, LODs, export specs — in seconds, not hours.
+  </p>
+  <div class="hero-actions">
+    <a href="#cta" class="btn-primary">Install Vexa</a>
+    <a href="#demo" class="btn-ghost">Watch demo</a>
+  </div>
+
+  <div class="hero-stat-strip">
+    <div class="hero-stat">
+      <span class="stat-n">94<span class="unit">%</span></span>
+      <span class="stat-label">Fewer QC rejections</span>
+    </div>
+    <div class="hero-stat">
+      <span class="stat-n">12<span class="unit">×</span></span>
+      <span class="stat-label">Faster pipeline review</span>
+    </div>
+    <div class="hero-stat">
+      <span class="stat-n">10<span class="unit">+</span></span>
+      <span class="stat-label">Automated checks</span>
+    </div>
+    <div class="hero-stat">
+      <span class="stat-n">0<span class="unit"> ms</span></span>
+      <span class="stat-label">Context switching</span>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO - Demo First -->
+<section class="demo-section" id="demo">
+  <div class="video-label">Demo</div>
+  <div class="video-wrapper reveal">
+    <div class="viewport-corners"></div>
+    <div class="video-inner" id="videoBtn">
+      <div class="play-btn">
+        <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+      </div>
+      <span class="video-caption">// demo video — drop your .mp4 here</span>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- FEATURES -->
+<section class="features-section" id="features">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-tag">Core Features</div>
+      <h2 class="section-title">Built for<br>game pipelines.</h2>
+    </div>
+    <p class="section-note">Every check tuned to real-world engine constraints — Unity, Unreal, Godot.</p>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <span class="feature-num">01</span>
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div class="feature-name">Topology Analysis</div>
+      <p class="feature-desc">Detects ngons, non-manifold geometry, overlapping faces, zero-area polygons, and triangle density violations.</p>
+      <div class="feature-accent-line"></div>
+    </div>
+
+    <div class="feature-card reveal">
+      <span class="feature-num">02</span>
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      </div>
+      <div class="feature-name">UV Validation</div>
+      <p class="feature-desc">Checks for UV overlaps, out-of-bounds islands, flipped UVs, texel density consistency, and lightmap compliance.</p>
+      <div class="feature-accent-line"></div>
+    </div>
+
+    <div class="feature-card reveal">
+      <span class="feature-num">03</span>
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+      </div>
+      <div class="feature-name">AI Scene Reading</div>
+      <p class="feature-desc">Reads your asset's role and adjusts tolerance thresholds accordingly.</p>
+      <div class="feature-accent-line"></div>
+    </div>
+
+    <div class="feature-card reveal">
+      <span class="feature-num">04</span>
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      </div>
+      <div class="feature-name">LOD Compliance</div>
+      <p class="feature-desc">Validates LOD chains — poly ratios, naming conventions, transition flags, and missing LOD detection.</p>
+      <div class="feature-accent-line"></div>
+    </div>
+
+    <div class="feature-card reveal">
+      <span class="feature-num">05</span>
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      </div>
+      <div class="feature-name">Naming Standards</div>
+      <p class="feature-desc">Enforces studio naming conventions across meshes, materials, textures, and bones.</p>
+      <div class="feature-accent-line"></div>
+    </div>
+
+    <div class="feature-card reveal">
+      <span class="feature-num">06</span>
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      </div>
+      <div class="feature-name">Export Reports</div>
+      <p class="feature-desc">One-click PDF or JSON reports with ranked issues, screenshots, and fix suggestions.</p>
+      <div class="feature-accent-line"></div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- HOW IT WORKS -->
+<section class="how-section" id="how">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-tag">Workflow</div>
+      <h2 class="section-title">Four steps<br>to clean assets.</h2>
+    </div>
+  </div>
+
+  <div class="steps-row">
+    <div class="step reveal">
+      <span class="step-num">Step 01</span>
+      <div class="step-title">Install & Configure</div>
+      <p class="step-desc">Install the .zip in Blender preferences. Set your engine target and naming rules once per project.</p>
+      <div class="step-connector"></div>
+    </div>
+    <div class="step reveal">
+      <span class="step-num">Step 02</span>
+      <div class="step-title">Select Assets</div>
+      <p class="step-desc">Select one object, a collection, or the entire scene. Vexa works at any scope.</p>
+      <div class="step-connector"></div>
+    </div>
+    <div class="step reveal">
+      <span class="step-num">Step 03</span>
+      <div class="step-title">Run Vexa</div>
+      <p class="step-desc">Hit the Vexa panel button. The AI engine analyses geometry, UVs, materials, hierarchy in seconds.</p>
+      <div class="step-connector"></div>
+    </div>
+    <div class="step reveal">
+      <span class="step-num">Step 04</span>
+      <div class="step-title">Fix & Export</div>
+      <p class="step-desc">Review the ranked issue list. Apply one-click auto-fixes, then export a clean QC report.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- CTA -->
+<section class="cta-section" id="cta">
+  <div class="cta-box reveal">
+    <div class="viewport-corners"></div>
+    <h2 class="cta-title">Ship cleaner<br><span>faster.</span></h2>
+    <p class="cta-sub">Install Vexa and run your first quality check in seconds.</p>
+    <div class="cta-actions">
+      <a href="#" class="btn-primary">Get Vexa Free</a>
+      <a href="#demo" class="btn-ghost">Watch demo</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Vex<span>A</span></div>
+  <ul class="footer-links">
+    <li><a href="#">Docs</a></li>
+    <li><a href="#">Changelog</a></li>
+    <li><a href="https://github.com" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="#">Discord</a></li>
+    <li><a href="#">Privacy</a></li>
+  </ul>
+  <span class="footer-copy">© 2026 Vexa. All rights reserved.</span>
+</footer>
+
+<script>
+  // Nav scroll
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // Custom cursor
+  const dot = document.getElementById('cursorDot');
+  const ring = document.getElementById('cursorRing');
+  
+  document.addEventListener('mousemove', e => {
+    dot.style.left = e.clientX + 'px';
+    dot.style.top = e.clientY + 'px';
+    ring.style.left = e.clientX + 'px';
+    ring.style.top = e.clientY + 'px';
+  });
+
+  // Cursor hover effect on interactive elements
+  const interactives = document.querySelectorAll('a, button, .video-inner, .feature-card, .step');
+  interactives.forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      ring.style.transform = 'translate(-50%, -50%) scale(1.5)';
+      ring.style.borderColor = 'var(--accent)';
+    });
+    el.addEventListener('mouseleave', () => {
+      ring.style.transform = 'translate(-50%, -50%) scale(1)';
+      ring.style.borderColor = 'var(--accent)';
+    });
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { 
+        e.target.classList.add('visible'); 
+        io.unobserve(e.target); 
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => io.observe(el));
+
+  // Video click handler
+  document.getElementById('videoBtn').addEventListener('click', function() {
+    // Add your demo video URL here
+    // window.open('YOUR_VIDEO_URL', '_blank');
+    console.log('Demo video placeholder clicked');
+  });
+
+  // Smooth scroll for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function(e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+</script>
+</body>
+</html>
