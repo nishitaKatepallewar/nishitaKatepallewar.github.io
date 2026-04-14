@@ -189,7 +189,7 @@
       .hero { min-height: 100vh; }
     }
     .hero-eyebrow {
-      font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em;
+      font-family: var(--mono); font-size: 15px; letter-spacing: 0.2em;
       color: var(--accent); text-transform: uppercase;
       margin-bottom: 24px;
       display: flex; align-items: center; gap: 16px;
@@ -202,7 +202,7 @@
       background: linear-gradient(90deg, var(--accent), transparent);
     }
     .hero-h1 {
-      font-size: clamp(56px, 8vw, 160px);
+      font-size: clamp(48px, 8vw, 140px);
       font-weight: 800;
       line-height: 0.88;
       letter-spacing: -0.04em;
@@ -413,6 +413,15 @@
       content: '_';
       color: var(--accent);
       animation: blink 1s step-end infinite;
+    }
+    .demo-video {
+      width: 100%;
+      aspect-ratio: 16/9;
+      display: block;
+      position: relative;
+      z-index: 1;
+      background: #000;
+      object-fit: contain;
     }
 
     /* STATS */
@@ -778,7 +787,7 @@
       .btn-primary, .btn-ghost { width: 100%; text-align: center; padding: 16px 24px; }
 
       .hero-stat-strip { flex-direction: column; margin-top: 40px; }
-      .hero-stat { border-right: none; border-bottom: 1px solid var(--border); }
+      .hero-stat { border-right: none; border-bottom: 1px solid var(--border); text-align: center; }
       .hero-stat:last-child { border-bottom: none; }
 
       .section-divider { margin: 0 20px; }
@@ -862,7 +871,7 @@
   <div class="hero-eyebrow">Blender Add-on</div>
   <h1 class="hero-h1">
     <span class="line1">Quality</span><br>
-    <span class="line2">Control,</span><br>
+    <span class="line2">Control&thinsp;,</span><br>
     <span class="accent-word">Automated.</span>
   </h1>
   <p class="hero-desc">
@@ -872,25 +881,6 @@
     <a href="/vexa.zip" class="btn-primary" download>Install Vexa</a>
     <a href="#demo" class="btn-ghost">Watch demo</a>
   </div>
-
-  <div class="hero-stat-strip">
-    <div class="hero-stat">
-      <span class="stat-n">94<span class="unit">%</span></span>
-      <span class="stat-label">Fewer QC rejections</span>
-    </div>
-    <div class="hero-stat">
-      <span class="stat-n">12<span class="unit">×</span></span>
-      <span class="stat-label">Faster pipeline review</span>
-    </div>
-    <div class="hero-stat">
-      <span class="stat-n">10<span class="unit">+</span></span>
-      <span class="stat-label">Automated checks</span>
-    </div>
-    <div class="hero-stat">
-      <span class="stat-n">0<span class="unit"> ms</span></span>
-      <span class="stat-label">Context switching</span>
-    </div>
-  </div>
 </section>
 
 <!-- VIDEO - Demo First -->
@@ -898,12 +888,9 @@
   <div class="video-label">Demo</div>
   <div class="video-wrapper reveal">
     <div class="viewport-corners"></div>
-    <div class="video-inner" id="videoBtn">
-      <div class="play-btn">
-        <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
-      </div>
-      <span class="video-caption">// demo video — drop your .mp4 here</span>
-    </div>
+    <video class="demo-video" id="demoVideo" controls playsinline preload="metadata">
+      <source src="/demo.mp4" type="video/mp4">
+    </video>
   </div>
 </section>
 
@@ -1018,6 +1005,25 @@
       <p class="step-desc">Review the ranked issue list. Apply one-click auto-fixes, then export a clean QC report.</p>
     </div>
   </div>
+
+  <div class="hero-stat-strip">
+    <div class="hero-stat">
+      <span class="stat-n">94<span class="unit">%</span></span>
+      <span class="stat-label">Fewer QC rejections</span>
+    </div>
+    <div class="hero-stat">
+      <span class="stat-n">12<span class="unit">×</span></span>
+      <span class="stat-label">Faster pipeline review</span>
+    </div>
+    <div class="hero-stat">
+      <span class="stat-n">10<span class="unit">+</span></span>
+      <span class="stat-label">Automated checks</span>
+    </div>
+    <div class="hero-stat">
+      <span class="stat-n">0<span class="unit"> ms</span></span>
+      <span class="stat-label">Context switching</span>
+    </div>
+  </div>
 </section>
 
 <hr class="section-divider">
@@ -1029,7 +1035,7 @@
     <h2 class="cta-title">Ship cleaner<br><span>faster.</span></h2>
     <p class="cta-sub">Install Vexa and run your first quality check in seconds.</p>
     <div class="cta-actions">
-      <a href="/vexa.zip" class="btn-primary" download>Get Vexa Free</a>
+      <a href="/vexa.zip" class="btn-primary" download>Get Vexa</a>
       <a href="#demo" class="btn-ghost">Watch demo</a>
     </div>
   </div>
@@ -1090,12 +1096,7 @@
   }, { threshold: 0, rootMargin: '0px 0px -40px 0px' });
   reveals.forEach(el => io.observe(el));
 
-  // Video click handler
-  document.getElementById('videoBtn').addEventListener('click', function() {
-    // Add your demo video URL here
-    // window.open('YOUR_VIDEO_URL', '_blank');
-    console.log('Demo video placeholder clicked');
-  });
+  // Video now uses native HTML5 controls
 
   // Hamburger menu
   const hamburger = document.getElementById('hamburger');
