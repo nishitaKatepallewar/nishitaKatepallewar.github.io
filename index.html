@@ -48,6 +48,13 @@
     }
 
     /* BACKGROUND EFFECTS */
+    .background-ambient-container {
+      position: fixed;
+      inset: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
     .bg-gradient-orb {
       position: fixed;
       border-radius: 50%;
@@ -190,8 +197,12 @@
       .demo-section { padding: 0 20px 60px; }
       .video-wrapper { max-width: 95vw; margin: 0 auto; }
     }
+    @media (max-width: 1024px) and (min-width: 600px) {
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+      .feature-card:nth-child(2n) { border-right: none; }
+    }
     .hero-eyebrow {
-      font-family: var(--mono); font-size: 15px; letter-spacing: 0.2em;
+      font-family: var(--mono); font-size: clamp(12px, 1.5vw, 15px); letter-spacing: 0.2em;
       color: var(--accent); text-transform: uppercase;
       margin-bottom: 24px;
       display: flex; align-items: center; gap: 16px;
@@ -224,8 +235,8 @@
     }
 
     .hero-desc {
-      font-family: var(--mono); font-size: 15px; line-height: 1.8;
-      color: var(--text-muted); max-width: 480px;
+      font-family: var(--mono); font-size: clamp(14px, 1.2vw, 18px); line-height: 1.8;
+      color: var(--text-muted); max-width: 600px;
       margin-bottom: 40px;
       animation: fadeSlideUp 0.8s ease forwards 0.3s;
       opacity: 0;
@@ -837,9 +848,11 @@
 <body>
 
 <!-- Background effects -->
-<div class="bg-gradient-orb orb-1"></div>
-<div class="bg-gradient-orb orb-2"></div>
-<div class="bg-gradient-orb orb-3"></div>
+<div class="background-ambient-container">
+  <div class="bg-gradient-orb orb-1"></div>
+  <div class="bg-gradient-orb orb-2"></div>
+  <div class="bg-gradient-orb orb-3"></div>
+</div>
 <div class="grid-bg"></div>
 
 <!-- Cursor -->
@@ -889,7 +902,7 @@
   <div class="video-label">Demo</div>
   <div class="video-wrapper reveal">
     <div class="viewport-corners"></div>
-    <video class="demo-video" id="demoVideo" controls playsinline preload="metadata">
+    <video class="demo-video" id="demoVideo" controls playsinline preload="metadata" poster="/thumbnail.png">
       <source src="/demo.mp4" type="video/mp4">
     </video>
   </div>
