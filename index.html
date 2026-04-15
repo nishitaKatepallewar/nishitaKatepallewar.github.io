@@ -783,6 +783,10 @@
     }
 
     @media (max-width: 768px) {
+      #features .section-title {
+        font-size: clamp(28px, 7.5vw, 40px);
+      }
+
       /* Contain background orbs so they never push layout width */
       .orb-1 { width: 300px; height: 300px; right: -60px; animation: none; }
       .orb-2 { width: 260px; height: 260px; left: -80px; animation: none; }
@@ -1063,10 +1067,7 @@
 <footer>
   <div class="footer-logo">Vex<span>A</span></div>
   <ul class="footer-links">
-    <li><a href="#">Docs</a></li>
-    <li><a href="#">Changelog</a></li>
     <li><a href="https://github.com/nishitaKatepallewar/Vexa" target="_blank" rel="noopener">GitHub</a></li>
-    <li><a href="#">Privacy</a></li>
   </ul>
   <span class="footer-copy">© 2026 Vexa. All rights reserved.</span>
 </footer>
