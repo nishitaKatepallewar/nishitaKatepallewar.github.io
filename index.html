@@ -6,7 +6,8 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <title>Vexa — AI Quality Control for 3D Assets</title>
+  <title>Vexa — Quality Control for 3D Game Assets</title>
+  <meta name="description" content="Vexa is a Blender add-on that runs quality checks on your 3D game assets in seconds.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -981,7 +982,7 @@
     <span class="accent-word">Automated.</span>
   </h1>
   <p class="hero-desc">
-    Vexa is an AI-powered Blender add-on that runs exhaustive quality checks on your 3D game assets — topology, UVs, naming, LODs, export specs — in seconds.
+    Vexa is a Blender add-on that runs quality checks on your 3D game assets — topology, UVs, textures, naming, export specs — in seconds.
   </p>
   <div class="hero-actions">
     <a href="#waitlist" class="btn-primary">Join the Pro waitlist</a>
@@ -1009,7 +1010,6 @@
       <div class="section-tag">Core Features</div>
       <h2 class="section-title">Built for<br>game pipelines.</h2>
     </div>
-    <p class="section-note">Every check tuned to game-ready engine constraints — Unity, Unreal, Godot.</p>
   </div>
 
   <div class="features-grid">
@@ -1019,7 +1019,7 @@
         <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
       </div>
       <div class="feature-name">Topology Analysis</div>
-      <p class="feature-desc">Detects ngons, non-manifold geometry, overlapping faces, zero-area polygons, and triangle density violations.</p>
+      <p class="feature-desc">Finds n-gons, non-planar faces and intersecting meshes. Fixes most in one click.</p>
       <div class="feature-accent-line"></div>
     </div>
 
@@ -1029,7 +1029,7 @@
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       </div>
       <div class="feature-name">UV Validation</div>
-      <p class="feature-desc">Checks for UV overlaps, out-of-bounds islands, flipped UVs, texel density consistency, and lightmap compliance.</p>
+      <p class="feature-desc">Catches missing UV maps and broken lightmap UVs.</p>
       <div class="feature-accent-line"></div>
     </div>
 
@@ -1038,18 +1038,18 @@
       <div class="feature-icon">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
       </div>
-      <div class="feature-name">AI Scene Reading</div>
-      <p class="feature-desc">Reads your asset's role and adjusts tolerance thresholds accordingly.</p>
+      <div class="feature-name">Texture Checks</div>
+      <p class="feature-desc">Flags missing images and wrong colour spaces.</p>
       <div class="feature-accent-line"></div>
     </div>
 
     <div class="feature-card reveal">
       <span class="feature-num">04</span>
       <div class="feature-icon">
-        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <svg viewBox="0 0 24 24"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
       </div>
-      <div class="feature-name">LOD Compliance</div>
-      <p class="feature-desc">Validates LOD chains — poly ratios, naming conventions, transition flags, and missing LOD detection.</p>
+      <div class="feature-name">Transforms</div>
+      <p class="feature-desc">Catches unapplied scale, mirrored objects and off-centre pivots.</p>
       <div class="feature-accent-line"></div>
     </div>
 
@@ -1059,7 +1059,7 @@
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       </div>
       <div class="feature-name">Naming Standards</div>
-      <p class="feature-desc">Enforces studio naming conventions across meshes, materials, textures, and bones.</p>
+      <p class="feature-desc">Flags default names, bad characters and missing prefixes like SM_.</p>
       <div class="feature-accent-line"></div>
     </div>
 
@@ -1069,7 +1069,7 @@
         <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       </div>
       <div class="feature-name">Export Reports</div>
-      <p class="feature-desc">One-click PDF or JSON reports with ranked issues, screenshots, and fix suggestions.</p>
+      <p class="feature-desc">Save every result as a JSON report.</p>
       <div class="feature-accent-line"></div>
     </div>
   </div>
@@ -1089,26 +1089,26 @@
   <div class="steps-row">
     <div class="step reveal">
       <span class="step-num">Step 01</span>
-      <div class="step-title">Install & Configure</div>
-      <p class="step-desc">Install the .zip in Blender preferences. Set your engine target and naming rules once per project.</p>
+      <div class="step-title">Install</div>
+      <p class="step-desc">Add the .zip in Blender's preferences. No account needed.</p>
       <div class="step-connector"></div>
     </div>
     <div class="step reveal">
       <span class="step-num">Step 02</span>
       <div class="step-title">Select Assets</div>
-      <p class="step-desc">Select one object, a collection, or the entire scene. Vexa works at any scope.</p>
+      <p class="step-desc">Select your meshes and open the Vexa tab (N).</p>
       <div class="step-connector"></div>
     </div>
     <div class="step reveal">
       <span class="step-num">Step 03</span>
-      <div class="step-title">Run Vexa</div>
-      <p class="step-desc">Hit the Vexa panel button. The AI engine analyses geometry, UVs, materials, hierarchy in seconds.</p>
+      <div class="step-title">Check</div>
+      <p class="step-desc">Pick a target and click Check Assets.</p>
       <div class="step-connector"></div>
     </div>
     <div class="step reveal">
       <span class="step-num">Step 04</span>
       <div class="step-title">Fix & Export</div>
-      <p class="step-desc">Review the ranked issue list. Apply one-click auto-fixes, then export a clean QC report.</p>
+      <p class="step-desc">Apply safe fixes in one click, then export.</p>
     </div>
   </div>
 
