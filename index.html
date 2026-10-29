@@ -954,7 +954,7 @@
   <a href="#features" class="mobile-link">Features</a>
   <a href="#how" class="mobile-link">How it works</a>
   <a href="#demo" class="mobile-link">Demo</a>
-  <a href="/vexa.zip" class="mobile-link" download>Get add-on</a>
+  <a href="/vexa.zip" class="mobile-link" download data-track="download">Get add-on</a>
   <a href="#waitlist" class="mobile-cta">Join Pro waitlist</a>
 </div>
 
@@ -986,7 +986,7 @@
   </p>
   <div class="hero-actions">
     <a href="#waitlist" class="btn-primary">Join the Pro waitlist</a>
-    <a href="/vexa.zip" class="btn-ghost" download>Download Vexa</a>
+    <a href="/vexa.zip" class="btn-ghost" download data-track="download">Download Vexa</a>
   </div>
 </section>
 
@@ -1183,7 +1183,7 @@
     <p class="cta-sub">Install Vexa and run your first quality check in seconds.</p>
     <div class="cta-actions">
       <a href="#waitlist" class="btn-primary">Join the waitlist</a>
-      <a href="/vexa.zip" class="btn-ghost" download>Get Vexa</a>
+      <a href="/vexa.zip" class="btn-ghost" download data-track="download">Get Vexa</a>
     </div>
   </div>
 </section>
@@ -1274,6 +1274,12 @@
      Until it's set, the form validates but doesn't send anything. */
   const FORM_ENDPOINT = "";
 
+  function track(name) {
+    try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: name, title: name, event: true }); } catch (e) {}
+  }
+  document.querySelectorAll('[data-track]').forEach(el => {
+    el.addEventListener('click', () => track(el.getAttribute('data-track')));
+  });
 
   const wlForm = document.getElementById('waitlistForm');
   const wlStatus = document.getElementById('wl-status');
@@ -1309,6 +1315,7 @@
       wlStatus.className = 'form-status ok';
       wlStatus.textContent = "You're on the list. We'll email you when the beta is ready.";
       wlForm.reset();
+      track('waitlist-signup');
     } catch (err) {
       wlStatus.className = 'form-status err';
       wlStatus.textContent = "That didn't go through. Check your connection and try again.";
@@ -1317,5 +1324,8 @@
     }
   });
 </script>
+
+<script data-goatcounter="https://vexa.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
