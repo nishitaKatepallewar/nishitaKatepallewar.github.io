@@ -6,7 +6,8 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <title>Vexa — AI Quality Control for 3D Assets</title>
+  <title>Vexa — Quality Control for 3D Game Assets</title>
+  <meta name="description" content="Vexa is a Blender add-on that runs quality checks on your 3D game assets in seconds.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -851,6 +852,87 @@
       footer { padding: 24px 16px; }
       .section-divider { margin: 0 16px; }
     }
+    /* PRO ANNOUNCEMENT PILL */
+    .pro-pill {
+      display: inline-flex; align-items: center; gap: 10px; align-self: flex-start;
+      font-family: var(--mono); font-size: clamp(12px, 1vw, 14px); letter-spacing: 0.08em;
+      color: var(--text) !important; text-transform: uppercase;
+      padding: 8px 14px; margin-bottom: 28px;
+      border: 1px solid rgba(234,118,0,0.45); background: rgba(234,118,0,0.08);
+      transition: background 0.2s ease, border-color 0.2s ease;
+      animation: fadeSlideUp 0.8s ease forwards; opacity: 0;
+    }
+    .pro-pill:hover { background: rgba(234,118,0,0.16); border-color: var(--accent); }
+    .pro-pill .pill-arrow { color: var(--accent); }
+
+
+    /* WAITLIST */
+    .waitlist-section { position: relative; z-index: 1; padding: 100px 48px; }
+    .waitlist-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+      border: 1px solid var(--border);
+    }
+    .waitlist-grid > * { min-width: 0; }
+    .pro-list { padding: 40px 36px; border-right: 1px solid var(--border); }
+    .pro-list ul { list-style: none; display: grid; gap: 18px; }
+    .pro-list li {
+      font-family: var(--mono); font-size: clamp(15px, 1.3vw, 18px); line-height: 1.6;
+      color: var(--text-muted); padding-left: 22px; position: relative;
+    }
+    .pro-list li::before {
+      content: ''; position: absolute; left: 0; top: 0.65em;
+      width: 8px; height: 8px; background: var(--accent);
+    }
+    .waitlist-form {
+      padding: 40px 36px; display: flex; flex-direction: column; justify-content: center; gap: 28px;
+      background: rgba(34,38,43,0.6);
+    }
+    .wl-label {
+      display: block; margin-bottom: 10px; padding: 0;
+      font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .wl-label .opt { text-transform: none; letter-spacing: 0; color: var(--text-dim); }
+    .waitlist-form label.wl-label { margin-bottom: -18px; }
+    .wl-row { display: flex; }
+    .wl-row input {
+      flex: 1; min-width: 0;
+      font-family: var(--mono); font-size: 15px; color: var(--text);
+      background: var(--bg); border: 1px solid var(--border-hi); border-right: none;
+      padding: 15px 16px; border-radius: 0; cursor: text;
+    }
+    .wl-row input:focus { outline: none; border-color: var(--accent); }
+    .wl-row .btn-primary { padding: 15px 34px; font-size: 13px; }
+    .wl-row .btn-primary:disabled { opacity: 0.6; transform: none; }
+    .wl-chips { border: none; display: flex; flex-wrap: wrap; gap: 8px; }
+    .wl-chips legend { width: 100%; }
+    .wl-chips label { cursor: pointer; }
+    .wl-chips input { position: absolute; opacity: 0; pointer-events: none; }
+    .wl-chips label span {
+      display: inline-block; padding: 9px 16px;
+      font-family: var(--mono); font-size: 14px; color: var(--text-muted);
+      border: 1px solid var(--border-hi); transition: all 0.2s ease;
+    }
+    .wl-chips label:hover span { color: var(--text); border-color: var(--text-muted); }
+    .wl-chips input:checked + span { color: var(--bg); background: var(--accent); border-color: var(--accent); }
+    .wl-chips input:focus-visible + span { box-shadow: 0 0 0 3px var(--accent-glow); }
+    .form-status { font-family: var(--mono); font-size: 14px; line-height: 1.6; min-height: 1.6em; }
+    .form-status.ok { color: #5fd38a; }
+    .form-status.err { color: #ff7a6b; }
+
+    @media (max-width: 900px) {
+      .waitlist-grid { grid-template-columns: 1fr; }
+      .pro-list { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+    @media (max-width: 768px) {
+      .waitlist-section { padding: 60px 20px; }
+      .pro-list, .waitlist-form { padding: 28px 20px; }
+      .wl-row { flex-direction: column; }
+      .wl-row input { border-right: 1px solid var(--border-hi); border-bottom: none; }
+    }
+    @media (max-width: 480px) {
+      .waitlist-section { padding: 48px 16px; }
+    }
   </style>
 </head>
 <body>
@@ -872,7 +954,8 @@
   <a href="#features" class="mobile-link">Features</a>
   <a href="#how" class="mobile-link">How it works</a>
   <a href="#demo" class="mobile-link">Demo</a>
-  <a href="/vexa.zip" class="mobile-cta" download>Get add-on</a>
+  <a href="/vexa.zip" class="mobile-link" download data-track="download">Get add-on</a>
+  <a href="#waitlist" class="mobile-cta">Join Pro waitlist</a>
 </div>
 
 <!-- NAV -->
@@ -882,8 +965,9 @@
     <li><a href="#features">Features</a></li>
     <li><a href="#how">How it works</a></li>
     <li><a href="#demo">Demo</a></li>
+    <li><a href="#waitlist">Vexa Pro</a></li>
   </ul>
-  <a href="/vexa.zip" class="nav-cta" download>Get add-on</a>
+  <a href="#waitlist" class="nav-cta">Join waitlist</a>
   <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
     <span></span><span></span><span></span>
   </button>
@@ -891,17 +975,18 @@
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-eyebrow">Blender Add-on</div>
+  <a href="#waitlist" class="pro-pill">Vexa Pro with Unity, Fab and Unreal presets coming soon <span class="pill-arrow">→</span></a>
   <h1 class="hero-h1">
     <span class="line1">Quality</span><br>
     <span class="line2">Control&thinsp;,</span><br>
     <span class="accent-word">Automated.</span>
   </h1>
   <p class="hero-desc">
-    Vexa is an AI-powered Blender add-on that runs exhaustive quality checks on your 3D game assets — topology, UVs, naming, LODs, export specs — in seconds.
+    Vexa is a Blender add-on that runs quality checks on your 3D game assets — topology, UVs, textures, naming, export specs — in seconds.
   </p>
   <div class="hero-actions">
-    <a href="/vexa.zip" class="btn-primary" download>Install Vexa</a>
+    <a href="#waitlist" class="btn-primary">Join the Pro waitlist</a>
+    <a href="/vexa.zip" class="btn-ghost" download data-track="download">Download Vexa</a>
   </div>
 </section>
 
@@ -925,7 +1010,6 @@
       <div class="section-tag">Core Features</div>
       <h2 class="section-title">Built for<br>game pipelines.</h2>
     </div>
-    <p class="section-note">Every check tuned to game-ready engine constraints — Unity, Unreal, Godot.</p>
   </div>
 
   <div class="features-grid">
@@ -935,7 +1019,7 @@
         <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
       </div>
       <div class="feature-name">Topology Analysis</div>
-      <p class="feature-desc">Detects ngons, non-manifold geometry, overlapping faces, zero-area polygons, and triangle density violations.</p>
+      <p class="feature-desc">Finds n-gons, non-planar faces and intersecting meshes. Fixes most in one click.</p>
       <div class="feature-accent-line"></div>
     </div>
 
@@ -945,7 +1029,7 @@
         <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
       </div>
       <div class="feature-name">UV Validation</div>
-      <p class="feature-desc">Checks for UV overlaps, out-of-bounds islands, flipped UVs, texel density consistency, and lightmap compliance.</p>
+      <p class="feature-desc">Catches missing UV maps and broken lightmap UVs.</p>
       <div class="feature-accent-line"></div>
     </div>
 
@@ -954,18 +1038,18 @@
       <div class="feature-icon">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
       </div>
-      <div class="feature-name">AI Scene Reading</div>
-      <p class="feature-desc">Reads your asset's role and adjusts tolerance thresholds accordingly.</p>
+      <div class="feature-name">Texture Checks</div>
+      <p class="feature-desc">Flags missing images and wrong colour spaces.</p>
       <div class="feature-accent-line"></div>
     </div>
 
     <div class="feature-card reveal">
       <span class="feature-num">04</span>
       <div class="feature-icon">
-        <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <svg viewBox="0 0 24 24"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
       </div>
-      <div class="feature-name">LOD Compliance</div>
-      <p class="feature-desc">Validates LOD chains — poly ratios, naming conventions, transition flags, and missing LOD detection.</p>
+      <div class="feature-name">Transforms</div>
+      <p class="feature-desc">Catches unapplied scale, mirrored objects and off-centre pivots.</p>
       <div class="feature-accent-line"></div>
     </div>
 
@@ -975,7 +1059,7 @@
         <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       </div>
       <div class="feature-name">Naming Standards</div>
-      <p class="feature-desc">Enforces studio naming conventions across meshes, materials, textures, and bones.</p>
+      <p class="feature-desc">Flags default names, bad characters and missing prefixes like SM_.</p>
       <div class="feature-accent-line"></div>
     </div>
 
@@ -985,7 +1069,7 @@
         <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       </div>
       <div class="feature-name">Export Reports</div>
-      <p class="feature-desc">One-click PDF or JSON reports with ranked issues, screenshots, and fix suggestions.</p>
+      <p class="feature-desc">Save every result as a JSON report.</p>
       <div class="feature-accent-line"></div>
     </div>
   </div>
@@ -1005,26 +1089,26 @@
   <div class="steps-row">
     <div class="step reveal">
       <span class="step-num">Step 01</span>
-      <div class="step-title">Install & Configure</div>
-      <p class="step-desc">Install the .zip in Blender preferences. Set your engine target and naming rules once per project.</p>
+      <div class="step-title">Install</div>
+      <p class="step-desc">Add the .zip in Blender's preferences. No account needed.</p>
       <div class="step-connector"></div>
     </div>
     <div class="step reveal">
       <span class="step-num">Step 02</span>
       <div class="step-title">Select Assets</div>
-      <p class="step-desc">Select one object, a collection, or the entire scene. Vexa works at any scope.</p>
+      <p class="step-desc">Select your meshes and open the Vexa tab (N).</p>
       <div class="step-connector"></div>
     </div>
     <div class="step reveal">
       <span class="step-num">Step 03</span>
-      <div class="step-title">Run Vexa</div>
-      <p class="step-desc">Hit the Vexa panel button. The AI engine analyses geometry, UVs, materials, hierarchy in seconds.</p>
+      <div class="step-title">Check</div>
+      <p class="step-desc">Pick a target and click Check Assets.</p>
       <div class="step-connector"></div>
     </div>
     <div class="step reveal">
       <span class="step-num">Step 04</span>
       <div class="step-title">Fix & Export</div>
-      <p class="step-desc">Review the ranked issue list. Apply one-click auto-fixes, then export a clean QC report.</p>
+      <p class="step-desc">Apply safe fixes in one click, then export.</p>
     </div>
   </div>
 
@@ -1050,6 +1134,47 @@
 
 <hr class="section-divider">
 
+<!-- WAITLIST -->
+<section class="waitlist-section" id="waitlist">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-tag">Vexa Pro · Coming soon</div>
+      <h2 class="section-title">Know it passes<br>before you submit.</h2>
+    </div>
+  </div>
+
+  <div class="waitlist-grid reveal">
+    <div class="pro-list">
+      <ul>
+        <li>Unity Asset Store, Fab, Unreal and Roblox presets</li>
+        <li>Lightmap UV checks</li>
+        <li>Collision and transform checks</li>
+        <li>Texel density checks</li>
+        <li>Batch reports from Blender or the command line</li>
+      </ul>
+    </div>
+
+    <form class="waitlist-form" id="waitlistForm" novalidate>
+      <label for="wl-email" class="wl-label">Email</label>
+      <div class="wl-row">
+        <input id="wl-email" name="email" type="email" autocomplete="email" placeholder="you@studio.com" required>
+        <button type="submit" class="btn-primary" id="wl-submit">Join</button>
+      </div>
+      <fieldset class="wl-chips">
+        <legend class="wl-label">I ship to <span class="opt">(optional)</span></legend>
+        <label><input type="radio" name="spec" value="unity-asset-store"><span>Unity</span></label>
+        <label><input type="radio" name="spec" value="fab"><span>Fab</span></label>
+        <label><input type="radio" name="spec" value="unreal"><span>Unreal</span></label>
+        <label><input type="radio" name="spec" value="roblox"><span>Roblox</span></label>
+        <label><input type="radio" name="spec" value="godot"><span>Godot</span></label>
+      </fieldset>
+      <p class="form-status" id="wl-status" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+
+<hr class="section-divider">
+
 <!-- CTA -->
 <section class="cta-section" id="cta">
   <div class="cta-box reveal">
@@ -1057,8 +1182,8 @@
     <h2 class="cta-title">Ship cleaner<br><span>faster.</span></h2>
     <p class="cta-sub">Install Vexa and run your first quality check in seconds.</p>
     <div class="cta-actions">
-      <a href="/vexa.zip" class="btn-primary" download>Get Vexa</a>
-      <a href="#demo" class="btn-ghost">Watch demo</a>
+      <a href="#waitlist" class="btn-primary">Join the waitlist</a>
+      <a href="/vexa.zip" class="btn-ghost" download data-track="download">Get Vexa</a>
     </div>
   </div>
 </section>
@@ -1143,6 +1268,62 @@
       }
     });
   });
+
+  // Waitlist form
+  const FORM_ENDPOINT = "https://formspree.io/f/mljjldda";
+
+  function track(name) {
+    try { if (window.goatcounter && window.goatcounter.count) window.goatcounter.count({ path: name, title: name, event: true }); } catch (e) {}
+  }
+  document.querySelectorAll('[data-track]').forEach(el => {
+    el.addEventListener('click', () => track(el.getAttribute('data-track')));
+  });
+
+  const wlForm = document.getElementById('waitlistForm');
+  const wlStatus = document.getElementById('wl-status');
+  const wlSubmit = document.getElementById('wl-submit');
+  wlForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    wlStatus.className = 'form-status'; wlStatus.textContent = '';
+    const email = document.getElementById('wl-email').value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      wlStatus.className = 'form-status err';
+      wlStatus.textContent = 'Enter a valid email address, like you@studio.com.';
+      document.getElementById('wl-email').focus();
+      return;
+    }
+    const data = {
+      email,
+      spec: (wlForm.querySelector('input[name="spec"]:checked') || {}).value || '',
+      source: 'getvexa.me'
+    };
+    if (!FORM_ENDPOINT) {
+      wlStatus.className = 'form-status err';
+      wlStatus.textContent = 'Signups are not connected yet. Set FORM_ENDPOINT in index.html.';
+      return;
+    }
+    wlSubmit.disabled = true; wlSubmit.textContent = 'Joining…';
+    try {
+      const r = await fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!r.ok) throw new Error(r.status);
+      wlStatus.className = 'form-status ok';
+      wlStatus.textContent = "You're on the list. We'll email you when the beta is ready.";
+      wlForm.reset();
+      track('waitlist-signup');
+    } catch (err) {
+      wlStatus.className = 'form-status err';
+      wlStatus.textContent = "That didn't go through. Check your connection and try again.";
+    } finally {
+      wlSubmit.disabled = false; wlSubmit.textContent = 'Join';
+    }
+  });
 </script>
+
+<script data-goatcounter="https://vexa.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
