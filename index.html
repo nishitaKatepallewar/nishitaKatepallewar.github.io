@@ -851,6 +851,73 @@
       footer { padding: 24px 16px; }
       .section-divider { margin: 0 16px; }
     }
+    /* WAITLIST */
+    .waitlist-section { position: relative; z-index: 1; padding: 100px 48px; }
+    .waitlist-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+      border: 1px solid var(--border);
+    }
+    .waitlist-grid > * { min-width: 0; }
+    .pro-list { padding: 40px 36px; border-right: 1px solid var(--border); }
+    .pro-list ul { list-style: none; display: grid; gap: 18px; }
+    .pro-list li {
+      font-family: var(--mono); font-size: clamp(15px, 1.3vw, 18px); line-height: 1.6;
+      color: var(--text-muted); padding-left: 22px; position: relative;
+    }
+    .pro-list li::before {
+      content: ''; position: absolute; left: 0; top: 0.65em;
+      width: 8px; height: 8px; background: var(--accent);
+    }
+    .waitlist-form {
+      padding: 40px 36px; display: flex; flex-direction: column; justify-content: center; gap: 28px;
+      background: rgba(34,38,43,0.6);
+    }
+    .wl-label {
+      display: block; margin-bottom: 10px; padding: 0;
+      font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--text-muted);
+    }
+    .wl-label .opt { text-transform: none; letter-spacing: 0; color: var(--text-dim); }
+    .waitlist-form label.wl-label { margin-bottom: -18px; }
+    .wl-row { display: flex; }
+    .wl-row input {
+      flex: 1; min-width: 0;
+      font-family: var(--mono); font-size: 15px; color: var(--text);
+      background: var(--bg); border: 1px solid var(--border-hi); border-right: none;
+      padding: 15px 16px; border-radius: 0; cursor: text;
+    }
+    .wl-row input:focus { outline: none; border-color: var(--accent); }
+    .wl-row .btn-primary { padding: 15px 34px; font-size: 13px; }
+    .wl-row .btn-primary:disabled { opacity: 0.6; transform: none; }
+    .wl-chips { border: none; display: flex; flex-wrap: wrap; gap: 8px; }
+    .wl-chips legend { width: 100%; }
+    .wl-chips label { cursor: pointer; }
+    .wl-chips input { position: absolute; opacity: 0; pointer-events: none; }
+    .wl-chips label span {
+      display: inline-block; padding: 9px 16px;
+      font-family: var(--mono); font-size: 14px; color: var(--text-muted);
+      border: 1px solid var(--border-hi); transition: all 0.2s ease;
+    }
+    .wl-chips label:hover span { color: var(--text); border-color: var(--text-muted); }
+    .wl-chips input:checked + span { color: var(--bg); background: var(--accent); border-color: var(--accent); }
+    .wl-chips input:focus-visible + span { box-shadow: 0 0 0 3px var(--accent-glow); }
+    .form-status { font-family: var(--mono); font-size: 14px; line-height: 1.6; min-height: 1.6em; }
+    .form-status.ok { color: #5fd38a; }
+    .form-status.err { color: #ff7a6b; }
+
+    @media (max-width: 900px) {
+      .waitlist-grid { grid-template-columns: 1fr; }
+      .pro-list { border-right: none; border-bottom: 1px solid var(--border); }
+    }
+    @media (max-width: 768px) {
+      .waitlist-section { padding: 60px 20px; }
+      .pro-list, .waitlist-form { padding: 28px 20px; }
+      .wl-row { flex-direction: column; }
+      .wl-row input { border-right: 1px solid var(--border-hi); border-bottom: none; }
+    }
+    @media (max-width: 480px) {
+      .waitlist-section { padding: 48px 16px; }
+    }
   </style>
 </head>
 <body>
@@ -1050,6 +1117,47 @@
 
 <hr class="section-divider">
 
+<!-- WAITLIST -->
+<section class="waitlist-section" id="waitlist">
+  <div class="section-header reveal">
+    <div>
+      <div class="section-tag">Vexa Pro · Coming soon</div>
+      <h2 class="section-title">Know it passes<br>before you submit.</h2>
+    </div>
+  </div>
+
+  <div class="waitlist-grid reveal">
+    <div class="pro-list">
+      <ul>
+        <li>Unity Asset Store, Fab, Unreal and Roblox presets</li>
+        <li>Lightmap UV checks</li>
+        <li>Collision and transform checks</li>
+        <li>Texel density checks</li>
+        <li>Batch reports from Blender or the command line</li>
+      </ul>
+    </div>
+
+    <form class="waitlist-form" id="waitlistForm" novalidate>
+      <label for="wl-email" class="wl-label">Email</label>
+      <div class="wl-row">
+        <input id="wl-email" name="email" type="email" autocomplete="email" placeholder="you@studio.com" required>
+        <button type="submit" class="btn-primary" id="wl-submit">Join</button>
+      </div>
+      <fieldset class="wl-chips">
+        <legend class="wl-label">I ship to <span class="opt">(optional)</span></legend>
+        <label><input type="radio" name="spec" value="unity-asset-store"><span>Unity</span></label>
+        <label><input type="radio" name="spec" value="fab"><span>Fab</span></label>
+        <label><input type="radio" name="spec" value="unreal"><span>Unreal</span></label>
+        <label><input type="radio" name="spec" value="roblox"><span>Roblox</span></label>
+        <label><input type="radio" name="spec" value="godot"><span>Godot</span></label>
+      </fieldset>
+      <p class="form-status" id="wl-status" role="status" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+
+<hr class="section-divider">
+
 <!-- CTA -->
 <section class="cta-section" id="cta">
   <div class="cta-box reveal">
@@ -1142,6 +1250,54 @@
         target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     });
+  });
+
+  /* ---------- Waitlist ----------
+     FORM_ENDPOINT: paste your Formspree form URL (https://formspree.io/f/xxxxxxx).
+     Until it's set, the form validates but doesn't send anything. */
+  const FORM_ENDPOINT = "";
+
+
+  const wlForm = document.getElementById('waitlistForm');
+  const wlStatus = document.getElementById('wl-status');
+  const wlSubmit = document.getElementById('wl-submit');
+  wlForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    wlStatus.className = 'form-status'; wlStatus.textContent = '';
+    const email = document.getElementById('wl-email').value.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      wlStatus.className = 'form-status err';
+      wlStatus.textContent = 'Enter a valid email address, like you@studio.com.';
+      document.getElementById('wl-email').focus();
+      return;
+    }
+    const data = {
+      email,
+      spec: (wlForm.querySelector('input[name="spec"]:checked') || {}).value || '',
+      source: 'getvexa.me'
+    };
+    if (!FORM_ENDPOINT) {
+      wlStatus.className = 'form-status err';
+      wlStatus.textContent = 'Signups are not connected yet. Set FORM_ENDPOINT in index.html.';
+      return;
+    }
+    wlSubmit.disabled = true; wlSubmit.textContent = 'Joining…';
+    try {
+      const r = await fetch(FORM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      if (!r.ok) throw new Error(r.status);
+      wlStatus.className = 'form-status ok';
+      wlStatus.textContent = "You're on the list. We'll email you when the beta is ready.";
+      wlForm.reset();
+    } catch (err) {
+      wlStatus.className = 'form-status err';
+      wlStatus.textContent = "That didn't go through. Check your connection and try again.";
+    } finally {
+      wlSubmit.disabled = false; wlSubmit.textContent = 'Join';
+    }
   });
 </script>
 </body>
