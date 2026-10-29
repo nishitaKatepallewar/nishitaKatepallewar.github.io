@@ -851,6 +851,20 @@
       footer { padding: 24px 16px; }
       .section-divider { margin: 0 16px; }
     }
+    /* PRO ANNOUNCEMENT PILL */
+    .pro-pill {
+      display: inline-flex; align-items: center; gap: 10px; align-self: flex-start;
+      font-family: var(--mono); font-size: clamp(12px, 1vw, 14px); letter-spacing: 0.08em;
+      color: var(--text) !important; text-transform: uppercase;
+      padding: 8px 14px; margin-bottom: 28px;
+      border: 1px solid rgba(234,118,0,0.45); background: rgba(234,118,0,0.08);
+      transition: background 0.2s ease, border-color 0.2s ease;
+      animation: fadeSlideUp 0.8s ease forwards; opacity: 0;
+    }
+    .pro-pill:hover { background: rgba(234,118,0,0.16); border-color: var(--accent); }
+    .pro-pill .pill-arrow { color: var(--accent); }
+
+
     /* WAITLIST */
     .waitlist-section { position: relative; z-index: 1; padding: 100px 48px; }
     .waitlist-grid {
@@ -939,7 +953,8 @@
   <a href="#features" class="mobile-link">Features</a>
   <a href="#how" class="mobile-link">How it works</a>
   <a href="#demo" class="mobile-link">Demo</a>
-  <a href="/vexa.zip" class="mobile-cta" download>Get add-on</a>
+  <a href="/vexa.zip" class="mobile-link" download>Get add-on</a>
+  <a href="#waitlist" class="mobile-cta">Join Pro waitlist</a>
 </div>
 
 <!-- NAV -->
@@ -949,8 +964,9 @@
     <li><a href="#features">Features</a></li>
     <li><a href="#how">How it works</a></li>
     <li><a href="#demo">Demo</a></li>
+    <li><a href="#waitlist">Vexa Pro</a></li>
   </ul>
-  <a href="/vexa.zip" class="nav-cta" download>Get add-on</a>
+  <a href="#waitlist" class="nav-cta">Join waitlist</a>
   <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
     <span></span><span></span><span></span>
   </button>
@@ -958,7 +974,7 @@
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-eyebrow">Blender Add-on</div>
+  <a href="#waitlist" class="pro-pill">Vexa Pro with Unity, Fab and Unreal presets coming soon <span class="pill-arrow">→</span></a>
   <h1 class="hero-h1">
     <span class="line1">Quality</span><br>
     <span class="line2">Control&thinsp;,</span><br>
@@ -968,7 +984,8 @@
     Vexa is an AI-powered Blender add-on that runs exhaustive quality checks on your 3D game assets — topology, UVs, naming, LODs, export specs — in seconds.
   </p>
   <div class="hero-actions">
-    <a href="/vexa.zip" class="btn-primary" download>Install Vexa</a>
+    <a href="#waitlist" class="btn-primary">Join the Pro waitlist</a>
+    <a href="/vexa.zip" class="btn-ghost" download>Download Vexa</a>
   </div>
 </section>
 
@@ -1165,8 +1182,8 @@
     <h2 class="cta-title">Ship cleaner<br><span>faster.</span></h2>
     <p class="cta-sub">Install Vexa and run your first quality check in seconds.</p>
     <div class="cta-actions">
-      <a href="/vexa.zip" class="btn-primary" download>Get Vexa</a>
-      <a href="#demo" class="btn-ghost">Watch demo</a>
+      <a href="#waitlist" class="btn-primary">Join the waitlist</a>
+      <a href="/vexa.zip" class="btn-ghost" download>Get Vexa</a>
     </div>
   </div>
 </section>
