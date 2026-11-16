@@ -202,10 +202,6 @@
       .demo-section { padding: 0 20px 60px; }
       .video-wrapper { max-width: 80vw; margin: 0 auto; }
     }
-    @media (max-width: 768px) and (min-width: 600px) {
-      .features-grid { grid-template-columns: repeat(2, 1fr); }
-      .feature-card:nth-child(2n) { border-right: none; }
-    }
     .hero-eyebrow {
       font-family: var(--mono); font-size: clamp(14px, 1.2vw, 17px); letter-spacing: 0.05em;
       color: var(--accent); text-transform: uppercase;
@@ -461,6 +457,7 @@
     .stat-n {
       font-size: clamp(32px, 3.2vw, 48px); font-weight: 800; display: block; margin-bottom: 6px;
     }
+    .stat-n .count { font-variant-numeric: tabular-nums; }
     .stat-n .unit { font-size: 18px; color: var(--accent); margin-left: 2px; }
     .stat-label {
       font-family: var(--mono); font-size: clamp(13px, 1.1vw, 15px); letter-spacing: 0.12em;
@@ -513,126 +510,90 @@
       text-align: right;
     }
 
-    .features-grid {
+    .feature-list { list-style: none; border-bottom: 1px solid var(--border); }
+    .feat-row {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      border: 1px solid var(--border);
-    }
-    .feature-card {
-      padding: 40px 36px;
-      border-right: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      position: relative;
-      transition: all 0.3s ease;
-    }
-    .feature-card::before {
-      content: '';
-      position: absolute;
-      top: 16px; left: 16px;
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--bg4);
-      transition: background 0.3s ease;
-    }
-    .feature-card::after {
-      content: '';
-      position: absolute;
-      left: 38px;
-      top: 18px;
-      width: 8px;
-      height: 1px;
-      background: var(--border);
-    }
-    .feature-card:hover::before { background: var(--accent); }
-    .feature-card:hover { 
-      background: var(--bg2);
-      transform: translateY(-4px);
-    }
-    .feature-card:nth-child(3n) { border-right: none; }
-    .feature-card:nth-child(n+4) { border-bottom: none; }
-    .feature-num {
-      font-family: var(--mono); font-size: clamp(12px, 1vw, 14px); letter-spacing: 0.15em;
-      font-weight: 500; color: var(--text-muted); margin-bottom: 28px;
-      display: block;
-    }
-    .feature-icon {
-      width: 44px; height: 44px; margin-bottom: 20px;
-      display: flex; align-items: center; justify-content: center;
-      border: 1px solid var(--border);
+      grid-template-columns: 80px minmax(220px, 300px) 1fr;
+      gap: 24px; align-items: baseline;
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
       position: relative;
     }
-    .feature-icon::before {
+    .feat-row::after {
       content: '';
-      position: absolute; top: -1px; left: 16px;
-      width: 6px; height: 6px;
-      background: var(--accent);
-    }
-    .feature-icon svg { 
-      width: 22px; height: 22px; 
-      stroke: var(--accent); fill: none; stroke-width: 1.5; 
-    }
-    .feature-name {
-      font-size: clamp(18px, 1.5vw, 22px); font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.05em; margin-bottom: 12px;
-    }
-    .feature-desc {
-      font-family: var(--mono); font-size: clamp(15px, 1.45vw, 19px); line-height: 1.8;
-      color: var(--text-muted);
-    }
-    .feature-accent-line {
-      position: absolute; bottom: 0; left: 0;
-      width: 0; height: 2px; background: var(--accent);
+      position: absolute; left: 0; bottom: -1px;
+      width: 0; height: 1px; background: var(--accent);
       transition: width 0.4s ease;
     }
-    .feature-card:hover .feature-accent-line { width: 100%; }
+    .feat-row:hover::after { width: 100%; }
+    .feat-num {
+      font-family: var(--mono); font-size: clamp(13px, 1.1vw, 15px); letter-spacing: 0.15em;
+      color: var(--text-dim);
+      transition: color 0.2s ease;
+    }
+    .feat-row:hover .feat-num { color: var(--accent); }
+    .feat-name {
+      font-size: clamp(18px, 1.6vw, 24px); font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .feat-desc {
+      font-family: var(--mono); font-size: clamp(15px, 1.35vw, 18px); line-height: 1.7;
+      color: var(--text-muted);
+    }
+    .feat-foot {
+      font-family: var(--mono); font-size: clamp(13px, 1.1vw, 15px);
+      color: var(--text-dim); padding-top: 24px;
+    }
+    .feat-foot span { color: var(--accent); margin-right: 8px; }
 
     /* HOW IT WORKS */
     .how-section {
       position: relative; z-index: 1;
       padding: 100px 48px;
     }
-    .steps-row {
+    .steps-track {
+      position: relative;
       display: grid; grid-template-columns: repeat(4, 1fr);
-      gap: 0;
-      border: 1px solid var(--border);
+      gap: 40px;
       margin-top: 60px;
     }
-    .step {
-      padding: 40px 32px;
-      border-right: 1px solid var(--border);
-      position: relative;
-      transition: background 0.3s ease;
+    .steps-line, .steps-fill {
+      position: absolute; top: 6px; left: 0; height: 1px;
     }
-    .step:hover { background: var(--bg2); }
-    .step:last-child { border-right: none; }
+    .steps-line { right: 0; background: var(--border-hi); }
+    .steps-fill {
+      width: 0; background: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+      transition: width 1.6s ease;
+    }
+    .steps-track.on .steps-fill { width: calc(75% + 30px + 7px); }
+    .step { position: relative; padding-top: 36px; }
+    .step-dot {
+      position: absolute; top: 0; left: 0;
+      width: 13px; height: 13px;
+      background: var(--bg);
+      border: 1px solid var(--text-dim);
+      transform: rotate(45deg);
+      transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .step.on .step-dot {
+      background: var(--accent); border-color: var(--accent);
+      box-shadow: 0 0 10px var(--accent-glow);
+    }
     .step-num {
       font-family: var(--mono); font-size: clamp(12px, 1vw, 14px); letter-spacing: 0.15em;
-      font-weight: 500; color: var(--accent); margin-bottom: 20px; display: block;
+      font-weight: 500; color: var(--text-dim); margin-bottom: 14px; display: block;
+      transition: color 0.3s ease;
     }
+    .step.on .step-num { color: var(--accent); }
     .step-title {
       font-size: clamp(16px, 1.4vw, 19px); font-weight: 700; text-transform: uppercase;
       letter-spacing: 0.04em; margin-bottom: 12px;
     }
     .step-desc {
-      font-family: var(--mono); font-size: clamp(15px, 1.45vw, 19px); line-height: 1.8;
+      font-family: var(--mono); font-size: clamp(15px, 1.35vw, 18px); line-height: 1.7;
       color: var(--text-muted);
     }
-    .step-connector {
-      position: absolute; top: 44px; right: -5px;
-      width: 10px; height: 10px;
-      background: var(--accent);
-      transform: rotate(45deg) translateX(50%);
-      z-index: 2;
-    }
-    .step-connector::before {
-      content: '';
-      position: absolute;
-      top: 50%; left: 100%;
-      width: 40px; height: 1px;
-      background: linear-gradient(90deg, var(--accent), var(--border));
-      overflow: hidden;
-    }
-    .step:last-child .step-connector { display: none; }
 
     /* CTA */
     .cta-section {
@@ -817,15 +778,15 @@
       .features-section, .how-section, .cta-section { padding: 60px 20px; }
       footer { padding: 28px 20px; }
 
-      .features-grid { grid-template-columns: 1fr; }
-      .feature-card { border-right: none; }
-      .feature-card:nth-child(n) { border-bottom: 1px solid var(--border); }
-      .feature-card:last-child { border-bottom: none; }
+      .feat-row { grid-template-columns: 48px 1fr; gap: 8px 12px; padding: 24px 0; }
+      .feat-desc { grid-column: 2; }
 
-      .steps-row { grid-template-columns: 1fr; }
-      .step { border-right: none; border-bottom: 1px solid var(--border); }
-      .step:last-child { border-bottom: none; }
-      .step-connector { display: none; }
+      .steps-track { grid-template-columns: 1fr; gap: 36px; margin-top: 40px; }
+      .steps-line, .steps-fill { top: 0; left: 6px; width: 1px; }
+      .steps-line { right: auto; height: var(--last-step, 100%); }
+      .steps-fill { height: 0; transition: height 1.6s ease; }
+      .steps-track.on .steps-fill { width: 1px; height: var(--last-step, 100%); }
+      .step { padding-top: 0; padding-left: 40px; }
 
       .section-header { flex-direction: column; align-items: flex-start; }
       .section-note { text-align: left; max-width: 100%; }
@@ -1012,67 +973,34 @@
     </div>
   </div>
 
-  <div class="features-grid">
-    <div class="feature-card reveal">
-      <span class="feature-num">01</span>
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-      </div>
-      <div class="feature-name">Topology Analysis</div>
-      <p class="feature-desc">Finds n-gons, non-planar faces and intersecting meshes. Fixes most in one click.</p>
-      <div class="feature-accent-line"></div>
-    </div>
-
-    <div class="feature-card reveal">
-      <span class="feature-num">02</span>
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-      </div>
-      <div class="feature-name">UV Validation</div>
-      <p class="feature-desc">Catches missing UV maps and broken lightmap UVs.</p>
-      <div class="feature-accent-line"></div>
-    </div>
-
-    <div class="feature-card reveal">
-      <span class="feature-num">03</span>
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-      </div>
-      <div class="feature-name">Texture Checks</div>
-      <p class="feature-desc">Flags missing images and wrong colour spaces.</p>
-      <div class="feature-accent-line"></div>
-    </div>
-
-    <div class="feature-card reveal">
-      <span class="feature-num">04</span>
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24"><polyline points="5 9 2 12 5 15"/><polyline points="9 5 12 2 15 5"/><polyline points="15 19 12 22 9 19"/><polyline points="19 9 22 12 19 15"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="12" y1="2" x2="12" y2="22"/></svg>
-      </div>
-      <div class="feature-name">Transforms</div>
-      <p class="feature-desc">Catches unapplied scale, mirrored objects and off-centre pivots.</p>
-      <div class="feature-accent-line"></div>
-    </div>
-
-    <div class="feature-card reveal">
-      <span class="feature-num">05</span>
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-      </div>
-      <div class="feature-name">Naming Standards</div>
-      <p class="feature-desc">Flags default names, bad characters and missing prefixes like SM_.</p>
-      <div class="feature-accent-line"></div>
-    </div>
-
-    <div class="feature-card reveal">
-      <span class="feature-num">06</span>
-      <div class="feature-icon">
-        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-      </div>
-      <div class="feature-name">Export Reports</div>
-      <p class="feature-desc">Save every result as a JSON report.</p>
-      <div class="feature-accent-line"></div>
-    </div>
-  </div>
+  <ul class="feature-list">
+    <li class="feat-row reveal">
+      <span class="feat-num">01</span>
+      <span class="feat-name">Topology</span>
+      <p class="feat-desc">Finds n-gons, non-planar faces and intersecting meshes. Fixes most in one click.</p>
+    </li>
+    <li class="feat-row reveal">
+      <span class="feat-num">02</span>
+      <span class="feat-name">UV Validation</span>
+      <p class="feat-desc">Catches missing UV maps and broken lightmap UVs.</p>
+    </li>
+    <li class="feat-row reveal">
+      <span class="feat-num">03</span>
+      <span class="feat-name">Textures</span>
+      <p class="feat-desc">Flags missing images and wrong colour spaces.</p>
+    </li>
+    <li class="feat-row reveal">
+      <span class="feat-num">04</span>
+      <span class="feat-name">Transforms</span>
+      <p class="feat-desc">Catches unapplied scale, mirrored objects and off-centre pivots.</p>
+    </li>
+    <li class="feat-row reveal">
+      <span class="feat-num">05</span>
+      <span class="feat-name">Naming</span>
+      <p class="feat-desc">Flags default names, bad characters and missing prefixes like SM_.</p>
+    </li>
+  </ul>
+  <p class="feat-foot reveal"><span>→</span>Every result saves as a JSON report.</p>
 </section>
 
 <hr class="section-divider">
@@ -1086,47 +1014,50 @@
     </div>
   </div>
 
-  <div class="steps-row">
-    <div class="step reveal">
+  <div class="steps-track" id="stepsTrack">
+    <div class="steps-line"></div>
+    <div class="steps-fill"></div>
+    <div class="step">
+      <div class="step-dot"></div>
       <span class="step-num">Step 01</span>
       <div class="step-title">Install</div>
       <p class="step-desc">Add the .zip in Blender's preferences. No account needed.</p>
-      <div class="step-connector"></div>
     </div>
-    <div class="step reveal">
+    <div class="step">
+      <div class="step-dot"></div>
       <span class="step-num">Step 02</span>
       <div class="step-title">Select Assets</div>
       <p class="step-desc">Select your meshes and open the Vexa tab (N).</p>
-      <div class="step-connector"></div>
     </div>
-    <div class="step reveal">
+    <div class="step">
+      <div class="step-dot"></div>
       <span class="step-num">Step 03</span>
       <div class="step-title">Check</div>
       <p class="step-desc">Pick a target and click Check Assets.</p>
-      <div class="step-connector"></div>
     </div>
-    <div class="step reveal">
+    <div class="step">
+      <div class="step-dot"></div>
       <span class="step-num">Step 04</span>
-      <div class="step-title">Fix & Export</div>
+      <div class="step-title">Fix &amp; Export</div>
       <p class="step-desc">Apply safe fixes in one click, then export.</p>
     </div>
   </div>
 
   <div class="hero-stat-strip">
     <div class="hero-stat">
-      <span class="stat-n">94<span class="unit">%</span></span>
+      <span class="stat-n"><span class="count" data-from="0" data-to="94">94</span><span class="unit">%</span></span>
       <span class="stat-label">Fewer QC rejections</span>
     </div>
     <div class="hero-stat">
-      <span class="stat-n">12<span class="unit">×</span></span>
+      <span class="stat-n"><span class="count" data-from="0" data-to="12">12</span><span class="unit">×</span></span>
       <span class="stat-label">Faster pipeline review</span>
     </div>
     <div class="hero-stat">
-      <span class="stat-n">32<span class="unit">+</span></span>
+      <span class="stat-n"><span class="count" data-from="0" data-to="32">32</span><span class="unit">+</span></span>
       <span class="stat-label">Automated checks</span>
     </div>
     <div class="hero-stat">
-      <span class="stat-n">0<span class="unit"> ms</span></span>
+      <span class="stat-n"><span class="count" data-from="100" data-to="0">0</span><span class="unit"> ms</span></span>
       <span class="stat-label">Context switching</span>
     </div>
   </div>
@@ -1216,7 +1147,7 @@
   });
 
   // Cursor hover effect on interactive elements
-  const interactives = document.querySelectorAll('a, button, .video-inner, .feature-card, .step');
+  const interactives = document.querySelectorAll('a, button, .video-inner, .feat-row');
   interactives.forEach(el => {
     el.addEventListener('mouseenter', () => {
       ring.style.transform = 'translate(-50%, -50%) scale(1.5)';
@@ -1241,6 +1172,50 @@
   reveals.forEach(el => io.observe(el));
 
   // Video now uses native HTML5 controls
+
+  // Stat count-up
+  const counters = document.querySelectorAll('.stat-n .count');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function runCount(el) {
+    const from = +el.dataset.from, to = +el.dataset.to, dur = 1600;
+    const t0 = performance.now();
+    const ease = t => 1 - Math.pow(1 - t, 3);
+    (function step(now) {
+      const t = Math.min((now - t0) / dur, 1);
+      el.textContent = Math.round(from + (to - from) * ease(t));
+      if (t < 1) requestAnimationFrame(step);
+    })(t0);
+  }
+  if (!reduceMotion) {
+    counters.forEach(el => { el.textContent = el.dataset.from; });
+    const countIO = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { runCount(e.target); countIO.unobserve(e.target); }
+      });
+    }, { threshold: 0.6 });
+    counters.forEach(el => countIO.observe(el));
+  }
+
+  // Steps timeline fill
+  const stepsTrack = document.getElementById('stepsTrack');
+  const stepEls = stepsTrack.querySelectorAll('.step');
+  // On mobile, end the vertical line at the last diamond
+  function sizeStepLine() {
+    stepsTrack.style.setProperty('--last-step', stepEls[stepEls.length - 1].offsetTop + 'px');
+  }
+  sizeStepLine();
+  window.addEventListener('resize', sizeStepLine);
+  function lightSteps() {
+    stepsTrack.classList.add('on');
+    stepEls.forEach((el, i) => setTimeout(() => el.classList.add('on'), reduceMotion ? 0 : i * 450));
+  }
+  if (reduceMotion) { lightSteps(); }
+  else {
+    const stepsIO = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting) { lightSteps(); stepsIO.disconnect(); }
+    }, { threshold: 0.5 });
+    stepsIO.observe(stepsTrack);
+  }
 
   // Hamburger menu
   const hamburger = document.getElementById('hamburger');
