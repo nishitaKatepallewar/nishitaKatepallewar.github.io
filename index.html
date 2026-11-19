@@ -6,8 +6,19 @@
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <script>document.documentElement.classList.add('js');</script>
   <title>Vexa — Quality Control for 3D Game Assets</title>
-  <meta name="description" content="Vexa is a Blender add-on that runs quality checks on your 3D game assets in seconds.">
+  <meta name="description" content="Vexa is a free Blender add-on that runs quality checks on your 3D game assets in seconds: topology, UVs, textures, transforms and naming.">
+  <link rel="canonical" href="https://getvexa.me/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://getvexa.me/">
+  <meta property="og:title" content="Vexa — Quality Control for 3D Game Assets">
+  <meta property="og:description" content="A free Blender add-on that catches topology, UV, texture, transform and naming problems before you export.">
+  <meta property="og:site_name" content="Vexa">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Vexa — Quality Control for 3D Game Assets">
+  <meta name="twitter:description" content="A free Blender add-on that catches topology, UV, texture, transform and naming problems before you export.">
+  <meta name="theme-color" content="#181b1e">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -23,8 +34,8 @@
       --border: rgba(255,255,255,0.06);
       --border-hi: rgba(255,255,255,0.12);
       --text: #e8edf2;
-      --text-muted: rgba(232,237,242,0.5);
-      --text-dim: rgba(232,237,242,0.28);
+      --text-muted: rgba(232,237,242,0.72);
+      --text-dim: rgba(232,237,242,0.55);
       --accent: #ea7600;
       --accent-dim: #c46200;
       --accent-glow: rgba(234,118,0,0.25);
@@ -36,6 +47,8 @@
     }
 
     html { scroll-behavior: smooth; overflow-x: hidden; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    section[id] { scroll-margin-top: 90px; }
 
     body {
       background: var(--bg);
@@ -43,7 +56,6 @@
       font-family: var(--sans);
       font-size: 16px;
       overflow-x: hidden;
-      cursor: crosshair;
     }
 
     /* Global link reset — kills browser blue on ALL anchor states */
@@ -166,22 +178,17 @@
       padding: 12px 24px;
       background: var(--accent); color: var(--bg) !important;
       border: none;
-      cursor: crosshair;
+      cursor: pointer;
       transition: all 0.2s ease;
       text-transform: uppercase;
       position: relative;
       text-decoration: none;
       display: inline-block;
     }
-    .nav-cta::after {
-      content: '⌘V';
-      position: absolute;
-      right: 8px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 9px;
-      opacity: 0.4;
-      color: var(--bg);
+    /* Hidden while another download button is on screen (toggled by JS) */
+    .nav-cta.is-hidden {
+      opacity: 0; visibility: hidden; pointer-events: none;
+      transform: translateY(-8px);
     }
     .nav-cta:hover { 
       background: var(--text); 
@@ -252,39 +259,13 @@
       font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em;
       padding: 16px 36px;
       background: var(--accent); color: var(--bg) !important;
-      border: none; cursor: crosshair;
+      border: none; cursor: pointer;
       transition: all 0.25s ease;
       text-transform: uppercase;
       position: relative;
       overflow: hidden;
       display: inline-block;
       text-decoration: none;
-    }
-    .btn-primary::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 1px; height: 100%;
-      background: rgba(0,0,0,0.15);
-    }
-    .btn-primary::after {
-      content: '⌘';
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 10px;
-      opacity: 0.4;
-      color: var(--bg);
-    }
-    .btn-ghost::after {
-      content: '⌥';
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 10px;
-      opacity: 0.4;
     }
     .btn-primary::before {
       content: '';
@@ -302,7 +283,7 @@
       font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em;
       padding: 16px 36px;
       background: transparent; color: var(--text-muted) !important;
-      border: 1px solid var(--border-hi); cursor: crosshair;
+      border: 1px solid var(--border-hi); cursor: pointer;
       transition: all 0.2s ease;
       text-transform: uppercase;
       display: inline-block;
@@ -678,6 +659,10 @@
     }
 
     /* CURSOR */
+    .cursor-dot, .cursor-ring { display: none; }
+    @media (hover: hover) and (pointer: fine) {
+      body.has-mouse .cursor-dot, body.has-mouse .cursor-ring { display: block; }
+    }
     .cursor-dot {
       position: fixed; width: 6px; height: 6px;
       background: var(--accent); border-radius: 50%;
@@ -813,6 +798,17 @@
       footer { padding: 24px 16px; }
       .section-divider { margin: 0 16px; }
     }
+    .hero-meta {
+      font-family: var(--mono); font-size: 13px; letter-spacing: 0.04em;
+      color: var(--text-dim); margin-top: 18px;
+      animation: fadeSlideUp 0.8s ease forwards 0.5s; opacity: 0;
+    }
+    .hero-meta a { text-decoration: underline; text-underline-offset: 3px; }
+    .hero-meta a:hover { color: var(--text); }
+    .stat-n .word { font-variant-numeric: normal; }
+    .form-note { font-family: var(--mono); font-size: 13px; line-height: 1.6; color: var(--text-dim); margin-top: -14px; }
+    .footer-links a:hover { color: var(--text); }
+
     /* PRO ANNOUNCEMENT PILL */
     .pro-pill {
       display: inline-flex; align-items: center; gap: 10px; align-self: flex-start;
@@ -894,29 +890,108 @@
     @media (max-width: 480px) {
       .waitlist-section { padding: 48px 16px; }
     }
+
+    /* =========================================================
+       MOTION SYSTEM
+       One easing curve, a few durations, used everywhere.
+       ========================================================= */
+    :root {
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);   /* smooth, decisive slow-down */
+      --dur: 0.9s;
+      --dur-short: 0.6s;
+    }
+
+    /* Hero pieces no longer use the old keyframe fade */
+    .pro-pill, .hero-h1, .hero-desc, .hero-actions, .hero-meta, .hero-stat-strip {
+      animation: none; opacity: 1;
+    }
+    .hero-h1 .accent-word { text-shadow: none; }
+
+    /* 1. Headlines rise into place, line by line */
+    .line-mask {
+      display: block; overflow: hidden;
+      padding-bottom: 0.12em; margin-bottom: -0.12em;  /* room for commas/descenders */
+    }
+    .line-inner { display: block; }
+    .js .split .line-inner {
+      transform: translateY(105%);
+      transition: transform var(--dur) var(--ease);
+      transition-delay: calc(var(--i, 0) * 90ms + var(--base-delay, 0ms));
+    }
+    .js .split.visible .line-inner { transform: none; }
+
+    /* 2. Body text comes into focus */
+    .js .reveal {
+      opacity: 0;
+      filter: blur(8px);
+      transform: translateY(10px);
+      transition:
+        opacity var(--dur) var(--ease),
+        filter var(--dur) var(--ease),
+        transform var(--dur) var(--ease);
+      transition-delay: var(--delay, 0ms);
+    }
+    .js .reveal.visible { opacity: 1; filter: none; transform: none; }
+
+    /* The demo settles into place rather than blurring */
+    .js .video-wrapper.reveal { filter: none; transform: scale(0.965) translateY(24px); transition-duration: 1.2s; }
+    .js .video-wrapper.reveal.visible { transform: none; }
+
+    /* Hero timing: headline first, then the rest follows */
+    .hero .hero-h1 { --base-delay: 120ms; }
+    .hero .pro-pill    { --delay: 0ms; }
+    .hero .hero-desc   { --delay: 480ms; }
+    .hero .hero-actions{ --delay: 580ms; }
+    .hero .hero-meta   { --delay: 680ms; }
+
+    /* 3. Hairlines draw themselves, left to right */
+    .js .section-divider {
+      transform: scaleX(0); transform-origin: left center;
+      transition: transform 1.4s var(--ease);
+    }
+    .js .section-divider.visible { transform: none; }
+
+    .js .section-header::before {
+      transform: scaleX(0); transform-origin: left center;
+      transition: transform 1.4s var(--ease);
+    }
+    .js .section-header.visible::before { transform: none; }
+
+    /* Feature rows: the top border becomes a line that draws in */
+    .feat-row { border-top: none; }
+    .feat-row::before {
+      content: ''; position: absolute; left: 0; right: 0; top: 0;
+      height: 1px; background: var(--border-hi);
+      transform-origin: left center;
+    }
+    .js .feat-row::before { transform: scaleX(0); transition: transform 1.2s var(--ease); transition-delay: var(--delay, 0ms); }
+    .js .feat-row.visible::before { transform: none; }
+
+    /* Calmer hover states that use the same curve */
+    .btn-primary, .btn-ghost, .nav-cta { transition-timing-function: var(--ease); }
+    .feat-row::after { transition: width 0.6s var(--ease); }
+
+    /* Reduced motion: show everything immediately */
+    @media (prefers-reduced-motion: reduce) {
+      .js .split .line-inner, .js .reveal, .js .section-divider,
+      .js .section-header::before, .js .feat-row::before {
+        transform: none !important; opacity: 1 !important; filter: none !important; transition: none !important;
+      }
+    }
   </style>
 </head>
 <body>
 
-<!-- Background effects -->
-<div class="background-ambient-container">
-  <div class="bg-gradient-orb orb-1"></div>
-  <div class="bg-gradient-orb orb-2"></div>
-  <div class="bg-gradient-orb orb-3"></div>
-</div>
 <div class="grid-bg"></div>
 
-<!-- Cursor -->
-<div class="cursor-dot" id="cursorDot"></div>
-<div class="cursor-ring" id="cursorRing"></div>
 
 <!-- Mobile menu drawer -->
 <div class="mobile-menu" id="mobileMenu">
   <a href="#features" class="mobile-link">Features</a>
   <a href="#how" class="mobile-link">How it works</a>
   <a href="#demo" class="mobile-link">Demo</a>
-  <a href="/vexa.zip" class="mobile-link" download data-track="download">Get add-on</a>
-  <a href="#waitlist" class="mobile-cta">Join Pro waitlist</a>
+  <a href="#waitlist" class="mobile-link">Vexa Pro</a>
+  <a href="/vexa.zip" class="mobile-cta" download data-track="download">Download free version</a>
 </div>
 
 <!-- NAV -->
@@ -928,48 +1003,48 @@
     <li><a href="#demo">Demo</a></li>
     <li><a href="#waitlist">Vexa Pro</a></li>
   </ul>
-  <a href="#waitlist" class="nav-cta">Join waitlist</a>
-  <button class="nav-hamburger" id="hamburger" aria-label="Open menu">
+  <a href="/vexa.zip" class="nav-cta is-hidden" download data-track="download">Get free version</a>
+  <button class="nav-hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false" aria-controls="mobileMenu">
     <span></span><span></span><span></span>
   </button>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
-  <a href="#waitlist" class="pro-pill">Vexa Pro with Unity, Fab and Unreal presets coming soon <span class="pill-arrow">→</span></a>
-  <h1 class="hero-h1">
+  <a href="#waitlist" class="pro-pill reveal">Coming soon: Vexa Pro with Unity, Fab, Unreal and Roblox presets <span class="pill-arrow">→</span></a>
+  <h1 class="hero-h1 split">
     <span class="line1">Quality</span><br>
-    <span class="line2">Control&thinsp;,</span><br>
+    <span class="line2">Control,</span><br>
     <span class="accent-word">Automated.</span>
   </h1>
-  <p class="hero-desc">
-    Vexa is a Blender add-on that runs quality checks on your 3D game assets — topology, UVs, textures, naming, export specs — in seconds.
+  <p class="hero-desc reveal">
+    Vexa is a free Blender add-on that checks your 3D game assets for topology, UV, texture, transform and naming problems in seconds, then fixes the safe ones in one click.
   </p>
-  <div class="hero-actions">
-    <a href="#waitlist" class="btn-primary">Join the Pro waitlist</a>
-    <a href="/vexa.zip" class="btn-ghost" download data-track="download">Download Vexa</a>
+  <div class="hero-actions reveal">
+    <a href="/vexa.zip" class="btn-primary" download data-track="download">Download free version</a>
+    <a href="#waitlist" class="btn-ghost">Join Pro waitlist</a>
   </div>
 </section>
 
 <!-- VIDEO - Demo First -->
 <section class="demo-section" id="demo">
-  <div class="video-label">Demo</div>
+  <div class="video-label reveal">Demo</div>
   <div class="video-wrapper reveal">
     <div class="viewport-corners"></div>
-    <video class="demo-video" id="demoVideo" controls playsinline preload="metadata">
-      <source src="/demo.mp4" type="video/mp4">
+    <video class="demo-video" id="demoVideo" controls playsinline preload="metadata" aria-label="Vexa demo: checking and fixing an asset in Blender">
+      <source src="/demo.mp4#t=0.1" type="video/mp4">
     </video>
   </div>
 </section>
 
-<hr class="section-divider">
+<hr class="section-divider draw">
 
 <!-- FEATURES -->
 <section class="features-section" id="features">
-  <div class="section-header reveal">
+  <div class="section-header draw">
     <div>
-      <div class="section-tag">Core Features</div>
-      <h2 class="section-title">Built for<br>game pipelines.</h2>
+      <div class="section-tag reveal">Core Features</div>
+      <h2 class="section-title split">Built for<br>game pipelines.</h2>
     </div>
   </div>
 
@@ -1003,14 +1078,14 @@
   <p class="feat-foot reveal"><span>→</span>Every result saves as a JSON report.</p>
 </section>
 
-<hr class="section-divider">
+<hr class="section-divider draw">
 
 <!-- HOW IT WORKS -->
 <section class="how-section" id="how">
-  <div class="section-header reveal">
+  <div class="section-header draw">
     <div>
-      <div class="section-tag">Workflow</div>
-      <h2 class="section-title">Four steps<br>to clean assets.</h2>
+      <div class="section-tag reveal">Workflow</div>
+      <h2 class="section-title split">Four steps<br>to clean assets.</h2>
     </div>
   </div>
 
@@ -1021,67 +1096,67 @@
       <div class="step-dot"></div>
       <span class="step-num">Step 01</span>
       <div class="step-title">Install</div>
-      <p class="step-desc">Add the .zip in Blender's preferences. No account needed.</p>
+      <p class="step-desc reveal">Add the .zip in Blender's preferences. No account needed.</p>
     </div>
     <div class="step">
       <div class="step-dot"></div>
       <span class="step-num">Step 02</span>
       <div class="step-title">Select Assets</div>
-      <p class="step-desc">Select your meshes and open the Vexa tab (N).</p>
+      <p class="step-desc reveal">Select your meshes and open the Vexa tab (N).</p>
     </div>
     <div class="step">
       <div class="step-dot"></div>
       <span class="step-num">Step 03</span>
       <div class="step-title">Check</div>
-      <p class="step-desc">Pick a target and click Check Assets.</p>
+      <p class="step-desc reveal">Pick a target and click Check Assets.</p>
     </div>
     <div class="step">
       <div class="step-dot"></div>
       <span class="step-num">Step 04</span>
       <div class="step-title">Fix &amp; Export</div>
-      <p class="step-desc">Apply safe fixes in one click, then export.</p>
+      <p class="step-desc reveal">Apply safe fixes in one click, then export.</p>
     </div>
   </div>
 
-  <div class="hero-stat-strip">
-    <div class="hero-stat">
-      <span class="stat-n"><span class="count" data-from="0" data-to="94">94</span><span class="unit">%</span></span>
-      <span class="stat-label">Fewer QC rejections</span>
-    </div>
-    <div class="hero-stat">
-      <span class="stat-n"><span class="count" data-from="0" data-to="12">12</span><span class="unit">×</span></span>
-      <span class="stat-label">Faster pipeline review</span>
-    </div>
+  <div class="hero-stat-strip reveal">
     <div class="hero-stat">
       <span class="stat-n"><span class="count" data-from="0" data-to="32">32</span><span class="unit">+</span></span>
       <span class="stat-label">Automated checks</span>
     </div>
     <div class="hero-stat">
-      <span class="stat-n"><span class="count" data-from="100" data-to="0">0</span><span class="unit"> ms</span></span>
-      <span class="stat-label">Context switching</span>
+      <span class="stat-n"><span class="count" data-from="0" data-to="5">5</span></span>
+      <span class="stat-label">Check categories</span>
+    </div>
+    <div class="hero-stat">
+      <span class="stat-n"><span class="count" data-from="0" data-to="1">1</span><span class="unit">-click</span></span>
+      <span class="stat-label">Safe fixes</span>
+    </div>
+    <div class="hero-stat">
+      <span class="stat-n"><span class="word">Free</span></span>
+      <span class="stat-label">No account needed</span>
     </div>
   </div>
 </section>
 
-<hr class="section-divider">
+<hr class="section-divider draw">
 
 <!-- WAITLIST -->
 <section class="waitlist-section" id="waitlist">
-  <div class="section-header reveal">
+  <div class="section-header draw">
     <div>
-      <div class="section-tag">Vexa Pro · Coming soon</div>
-      <h2 class="section-title">Know it passes<br>before you submit.</h2>
+      <div class="section-tag reveal">Vexa Pro · Join the waitlist</div>
+      <h2 class="section-title split">Know it passes<br>before you submit.</h2>
     </div>
   </div>
 
   <div class="waitlist-grid reveal">
     <div class="pro-list">
       <ul>
-        <li>Unity Asset Store, Fab, Unreal and Roblox presets</li>
-        <li>Lightmap UV checks</li>
-        <li>Collision and transform checks</li>
+        <li>Marketplace presets for Unity Asset Store, Fab, Unreal and Roblox, so you check against each store's actual rules</li>
         <li>Texel density checks</li>
-        <li>Batch reports from Blender or the command line</li>
+        <li>Collision mesh checks</li>
+        <li>Batch reports for whole folders, from Blender or the command line</li>
+        <li>Everything in the free version</li>
       </ul>
     </div>
 
@@ -1098,23 +1173,25 @@
         <label><input type="radio" name="spec" value="unreal"><span>Unreal</span></label>
         <label><input type="radio" name="spec" value="roblox"><span>Roblox</span></label>
         <label><input type="radio" name="spec" value="godot"><span>Godot</span></label>
+        <label><input type="radio" name="spec" value="other"><span>Other</span></label>
       </fieldset>
       <p class="form-status" id="wl-status" role="status" aria-live="polite"></p>
+      <p class="form-note">We'll only email you about Vexa Pro. No spam, and you can unsubscribe anytime.</p>
     </form>
   </div>
 </section>
 
-<hr class="section-divider">
+<hr class="section-divider draw">
 
 <!-- CTA -->
 <section class="cta-section" id="cta">
-  <div class="cta-box reveal">
+  <div class="cta-box">
     <div class="viewport-corners"></div>
-    <h2 class="cta-title">Ship cleaner<br><span>faster.</span></h2>
-    <p class="cta-sub">Install Vexa and run your first quality check in seconds.</p>
-    <div class="cta-actions">
-      <a href="#waitlist" class="btn-primary">Join the waitlist</a>
-      <a href="/vexa.zip" class="btn-ghost" download data-track="download">Get Vexa</a>
+    <h2 class="cta-title split">Ship cleaner<br><span>faster.</span></h2>
+    <p class="cta-sub reveal">Download the free version and run your first check in seconds. Want Pro? Join the waitlist.</p>
+    <div class="cta-actions reveal">
+      <a href="/vexa.zip" class="btn-primary" download data-track="download">Download free version</a>
+      <a href="#waitlist" class="btn-ghost">Join Pro waitlist</a>
     </div>
   </div>
 </section>
@@ -1123,7 +1200,8 @@
 <footer>
   <div class="footer-logo">Vex<span>A</span></div>
   <ul class="footer-links">
-    <li><a href="https://github.com/nishitaKatepallewar/Vexa" target="_blank" rel="noopener">GitHub</a></li>
+    <li><a href="https://docs.google.com/forms/d/e/1FAIpQLSeZzEDiPgHX3QlN-Vdr50NqP626nCnzir3ng-SrfHYhyxX3iw/viewform" target="_blank" rel="noopener">Report a bug</a></li>
+    <li><a href="mailto:hello@getvexa.me">Contact</a></li>
   </ul>
   <span class="footer-copy">© 2026 Vexa. All rights reserved.</span>
 </footer>
@@ -1135,41 +1213,40 @@
     nav.classList.toggle('scrolled', window.scrollY > 40);
   });
 
-  // Custom cursor
-  const dot = document.getElementById('cursorDot');
-  const ring = document.getElementById('cursorRing');
-  
-  document.addEventListener('mousemove', e => {
-    dot.style.left = e.clientX + 'px';
-    dot.style.top = e.clientY + 'px';
-    ring.style.left = e.clientX + 'px';
-    ring.style.top = e.clientY + 'px';
+  // Nav download button: only show it when the hero and final download buttons are off screen
+  const navCta = document.querySelector('.nav-cta');
+  const ctaGroups = document.querySelectorAll('.hero-actions, .cta-actions');
+  const groupVisible = new Map();
+  const ctaIO = new IntersectionObserver(entries => {
+    entries.forEach(e => groupVisible.set(e.target, e.isIntersecting));
+    const anyVisible = [...groupVisible.values()].some(Boolean);
+    navCta.classList.toggle('is-hidden', anyVisible);
+  }, { rootMargin: '-80px 0px 0px 0px' });
+  ctaGroups.forEach(el => ctaIO.observe(el));
+
+  // Split headlines into masked lines (split on <br>)
+  document.querySelectorAll('.split').forEach(el => {
+    const lines = el.innerHTML.split(/<br\s*\/?>/i);
+    el.innerHTML = lines.map((html, i) =>
+      `<span class="line-mask"><span class="line-inner" style="--i:${i}">${html.trim()}</span></span>`
+    ).join('');
   });
 
-  // Cursor hover effect on interactive elements
-  const interactives = document.querySelectorAll('a, button, .video-inner, .feat-row');
-  interactives.forEach(el => {
-    el.addEventListener('mouseenter', () => {
-      ring.style.transform = 'translate(-50%, -50%) scale(1.5)';
-      ring.style.borderColor = 'var(--accent)';
-    });
-    el.addEventListener('mouseleave', () => {
-      ring.style.transform = 'translate(-50%, -50%) scale(1)';
-      ring.style.borderColor = 'var(--accent)';
-    });
-  });
+  // Stagger feature rows and step descriptions
+  document.querySelectorAll('.feat-row').forEach((el, i) => el.style.setProperty('--delay', (i * 70) + 'ms'));
+  document.querySelectorAll('.step-desc').forEach((el, i) => el.style.setProperty('--delay', (i * 120) + 'ms'));
 
-  // Scroll reveal
-  const reveals = document.querySelectorAll('.reveal');
+  // One observer: reveal, split headlines and drawn lines all get .visible once
+  const animated = document.querySelectorAll('.reveal, .split, .draw');
   const io = new IntersectionObserver(entries => {
     entries.forEach(e => {
-      if (e.isIntersecting) { 
-        e.target.classList.add('visible'); 
-        io.unobserve(e.target); 
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        io.unobserve(e.target);
       }
     });
-  }, { threshold: 0, rootMargin: '0px 0px -40px 0px' });
-  reveals.forEach(el => io.observe(el));
+  }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+  animated.forEach(el => io.observe(el));
 
   // Video now uses native HTML5 controls
 
@@ -1223,24 +1300,17 @@
   hamburger.addEventListener('click', () => {
     const isOpen = mobileMenu.classList.toggle('open');
     hamburger.classList.toggle('open', isOpen);
+    hamburger.setAttribute('aria-expanded', isOpen);
+    hamburger.setAttribute('aria-label', isOpen ? 'Close menu' : 'Open menu');
     document.body.style.overflow = isOpen ? 'hidden' : '';
   });
   mobileMenu.querySelectorAll('a').forEach(link => {
     link.addEventListener('click', () => {
       mobileMenu.classList.remove('open');
       hamburger.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+      hamburger.setAttribute('aria-label', 'Open menu');
       document.body.style.overflow = '';
-    });
-  });
-
-  // Smooth scroll for anchor links
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-      e.preventDefault();
-      const target = document.querySelector(this.getAttribute('href'));
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
     });
   });
 
@@ -1272,11 +1342,6 @@
       spec: (wlForm.querySelector('input[name="spec"]:checked') || {}).value || '',
       source: 'getvexa.me'
     };
-    if (!FORM_ENDPOINT) {
-      wlStatus.className = 'form-status err';
-      wlStatus.textContent = 'Signups are not connected yet. Set FORM_ENDPOINT in index.html.';
-      return;
-    }
     wlSubmit.disabled = true; wlSubmit.textContent = 'Joining…';
     try {
       const r = await fetch(FORM_ENDPOINT, {
@@ -1286,7 +1351,7 @@
       });
       if (!r.ok) throw new Error(r.status);
       wlStatus.className = 'form-status ok';
-      wlStatus.textContent = "You're on the list. We'll email you when the beta is ready.";
+      wlStatus.textContent = "You're on the list. We'll email you when Vexa Pro is ready.";
       wlForm.reset();
       track('waitlist-signup');
     } catch (err) {
