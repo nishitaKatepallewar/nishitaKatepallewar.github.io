@@ -1071,8 +1071,8 @@
 
     /* =========================================================
        INTERACTIVE CURSOR
-       A Blender-style + that tracks the mouse exactly, and a circle that
-       follows with a little lag, stretches with speed and reacts to targets.
+       A Blender-style + that tracks the mouse exactly, inside a fixed circle
+       that grows over clickable things and shrinks on click.
        Mouse/trackpad only; touch devices keep their normal behaviour.
        ========================================================= */
     html.has-vx-cursor, html.has-vx-cursor * { cursor: none !important; }
@@ -1153,7 +1153,6 @@
 
 <!-- HERO -->
 <section class="hero">
-  <a href="#waitlist" class="pro-pill reveal">Coming soon: Vexa Pro with Unity, Fab, Unreal and Roblox presets <span class="pill-arrow">→</span></a>
   <h1 class="hero-h1 split">
     <span class="line1">Quality</span><br>
     <span class="line2">Control,</span><br>
@@ -1594,18 +1593,15 @@
     }
 
     function frame() {
-      const k = still ? 1 : 0.2;
+      const k = still ? 1 : 0.45;   // stays snug around the +
       const dx = mx - rx, dy = my - ry;
       rx += dx * k; ry += dy * k;
       scale += (targetScale - scale) * (still ? 1 : 0.18);
 
-      // Stretch the circle a little in the direction of movement
       const speed = Math.hypot(dx, dy);
-      const stretch = still ? 0 : Math.min(speed / 90, 0.35);
-      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
 
       plus.style.transform = `translate3d(${mx}px, ${my}px, 0) scale(${down ? 0.85 : 1})`;
-      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) rotate(${angle}deg) scale(${scale * (1 + stretch)}, ${scale * (1 - stretch * 0.5)})`;
+      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) scale(${scale})`;
 
       if (speed > 0.1 || Math.abs(targetScale - scale) > 0.002) requestAnimationFrame(frame);
       else running = false;
