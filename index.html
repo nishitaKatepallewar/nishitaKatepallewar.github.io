@@ -978,6 +978,18 @@
         transform: none !important; opacity: 1 !important; filter: none !important; transition: none !important;
       }
     }
+
+    /* Contact email: copy on click with a small confirmation */
+    .copy-email { position: relative; }
+    .copy-email::after {
+      content: attr(data-msg); position: absolute; left: 50%; bottom: calc(100% + 8px);
+      transform: translate(-50%, 4px);
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
+      padding: 4px 8px; background: var(--accent); color: var(--bg);
+      opacity: 0; pointer-events: none; transition: opacity 0.2s ease, transform 0.2s ease;
+      white-space: nowrap;
+    }
+    .copy-email.copied::after { opacity: 1; transform: translate(-50%, 0); }
   </style>
 </head>
 <body>
@@ -1120,7 +1132,7 @@
 
   <div class="hero-stat-strip reveal">
     <div class="hero-stat">
-      <span class="stat-n"><span class="count" data-from="0" data-to="32">32</span><span class="unit">+</span></span>
+      <span class="stat-n"><span class="count" data-from="0" data-to="34">34</span><span class="unit">+</span></span>
       <span class="stat-label">Automated checks</span>
     </div>
     <div class="hero-stat">
@@ -1201,7 +1213,7 @@
   <div class="footer-logo">Vex<span>A</span></div>
   <ul class="footer-links">
     <li><a href="https://docs.google.com/forms/d/e/1FAIpQLSeZzEDiPgHX3QlN-Vdr50NqP626nCnzir3ng-SrfHYhyxX3iw/viewform" target="_blank" rel="noopener">Report a bug</a></li>
-    <li><a href="mailto:hello@getvexa.me">Contact</a></li>
+    <li><a href="mailto:hello@getvexa.me" class="copy-email" data-email="hello@getvexa.me" title="Click to copy">hello@getvexa.me</a></li>
   </ul>
   <span class="footer-copy">© 2026 Vexa. All rights reserved.</span>
 </footer>
@@ -1311,6 +1323,44 @@
       hamburger.setAttribute('aria-expanded', 'false');
       hamburger.setAttribute('aria-label', 'Open menu');
       document.body.style.overflow = '';
+    });
+  });
+
+  // Contact email: copy the address on click (mailto still opens a mail app if one is set up).
+  // Tries the Clipboard API, then the older copy command; if the browser blocks both,
+  // it selects the address and asks the visitor to press Ctrl/Cmd+C.
+  document.querySelectorAll('.copy-email').forEach(link => {
+    const show = (msg) => {
+      link.dataset.msg = msg;
+      link.classList.add('copied');
+      clearTimeout(link._t);
+      link._t = setTimeout(() => link.classList.remove('copied'), 2200);
+    };
+    const legacyCopy = (text) => {
+      const t = document.createElement('textarea');
+      t.value = text; t.setAttribute('readonly', '');
+      t.style.position = 'fixed'; t.style.top = '0'; t.style.opacity = '0';
+      document.body.appendChild(t); t.select();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) {}
+      t.remove();
+      return ok;
+    };
+    const selectText = () => {
+      const r = document.createRange(); r.selectNodeContents(link);
+      const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+    };
+    link.addEventListener('click', () => {
+      const email = link.dataset.email;
+      const fallback = () => {
+        if (legacyCopy(email)) show('Copied');
+        else { selectText(); show(/Mac/i.test(navigator.platform) ? 'Press ⌘C to copy' : 'Press Ctrl+C to copy'); }
+      };
+      if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(email).then(() => show('Copied')).catch(fallback);
+      } else {
+        fallback();
+      }
     });
   });
 
