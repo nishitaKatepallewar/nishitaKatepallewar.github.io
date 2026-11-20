@@ -990,9 +990,139 @@
       white-space: nowrap;
     }
     .copy-email.copied::after { opacity: 1; transform: translate(-50%, 0); }
+
+    /* =========================================================
+       DEMO CAROUSEL
+       ========================================================= */
+    .demo-head {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      margin-bottom: 16px;
+    }
+    .demo-title {
+      font-family: var(--mono); font-size: clamp(12px, 1vw, 14px); letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--text-muted);
+      display: flex; align-items: center; gap: 14px;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    .demo-title::before {
+      content: ''; width: 24px; height: 1px; background: var(--accent);
+    }
+    .demo-title.swap { opacity: 0; transform: translateY(4px); }
+
+    /* Arrows sit beside the video, vertically centred */
+    .demo-stage { position: relative; }
+    .demo-arrow {
+      position: absolute; top: 50%; z-index: 3;
+      width: 56px; height: 56px; padding: 0;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: rgba(234,118,0,0.08); border: 1px solid rgba(234,118,0,0.55);
+      cursor: pointer;
+      transform: translateY(-50%);
+      transition: opacity 0.3s ease, background 0.25s ease, border-color 0.25s ease;
+    }
+    .demo-arrow--next { left: calc(100% + 24px); }
+    .demo-arrow--prev { right: calc(100% + 24px); }
+    /* Orange chevron (not a solid triangle, so it never reads as a play button) */
+    .demo-arrow::before {
+      content: ''; width: 12px; height: 12px;
+      border-top: 2px solid var(--accent); border-right: 2px solid var(--accent);
+      transform: translateX(-3px) rotate(45deg);
+      transition: transform 0.3s var(--ease, ease), border-color 0.25s ease;
+    }
+    .demo-arrow--prev::before { transform: translateX(3px) rotate(-135deg); }
+    .demo-arrow:hover:not(:disabled) { background: var(--accent); border-color: var(--accent); }
+    .demo-arrow:hover:not(:disabled)::before { border-color: var(--bg); transform: translateX(0) rotate(45deg); }
+    .demo-arrow--prev:hover:not(:disabled)::before { transform: translateX(0) rotate(-135deg); }
+    .demo-arrow:disabled { opacity: 0; pointer-events: none; }
+    .demo-arrow:focus-visible { outline: 1px solid var(--accent); outline-offset: 3px; }
+
+    /* Gentle nudge on the next arrow so it reads as "there's more" */
+    @keyframes nudge { 0%, 100% { transform: translateX(-3px) rotate(45deg); } 50% { transform: translateX(3px) rotate(45deg); } }
+    .demo-arrow.hint::before { animation: nudge 1.6s var(--ease, ease) 3; }
+
+    /* Slides sit side by side; the track slides left/right */
+    .demo-track {
+      display: flex; position: relative; z-index: 1;
+      transition: transform 0.8s var(--ease, cubic-bezier(0.22, 1, 0.36, 1));
+    }
+    .demo-slide { flex: 0 0 100%; min-width: 0; }
+
+    @media (min-width: 769px) {
+      .demo-head, .demo-stage { max-width: 80vw; margin-left: auto; margin-right: auto; }
+      .demo-stage .video-wrapper { max-width: none; }
+    }
+    /* No side space on smaller screens: arrows sit on the video's edge, on a dark circle */
+    @media (max-width: 1100px) {
+      .demo-arrow {
+        width: 44px; height: 44px; border-radius: 50%;
+        background: rgba(24,27,30,0.78); border-color: rgba(234,118,0,0.7);
+        backdrop-filter: blur(6px);
+        top: 42%;
+      }
+      .demo-arrow--next { left: auto; right: 12px; }
+      .demo-arrow--prev { right: auto; left: 12px; }
+      .demo-arrow::before { width: 10px; height: 10px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .demo-track { transition: none; }
+      .demo-arrow.hint::before { animation: none; }
+    }
+
+
+    /* =========================================================
+       INTERACTIVE CURSOR
+       A Blender-style + that tracks the mouse exactly, and a circle that
+       follows with a little lag, stretches with speed and reacts to targets.
+       Mouse/trackpad only; touch devices keep their normal behaviour.
+       ========================================================= */
+    html.has-vx-cursor, html.has-vx-cursor * { cursor: none !important; }
+    html.has-vx-cursor input[type="email"], html.has-vx-cursor input[type="text"],
+    html.has-vx-cursor textarea { cursor: text !important; }
+
+    .vx-plus, .vx-ring {
+      position: fixed; top: 0; left: 0; pointer-events: none; z-index: 10000;
+      will-change: transform; opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    html.has-vx-cursor .vx-plus, html.has-vx-cursor .vx-ring { opacity: 1; }
+
+    .vx-plus { width: 22px; height: 22px; margin: -11px 0 0 -11px; color: var(--text); }
+    .vx-plus svg {
+      display: block; width: 100%; height: 100%; overflow: visible;
+      transition: transform 0.45s var(--ease, cubic-bezier(0.22, 1, 0.36, 1)), color 0.2s ease;
+    }
+    .vx-plus .outline { stroke: rgba(11,13,15,0.85); stroke-width: 3.5; }
+    .vx-plus .line { stroke: currentColor; stroke-width: 1.5; }
+
+    .vx-ring {
+      width: 38px; height: 38px; margin: -19px 0 0 -19px; border-radius: 50%;
+      border: 1px solid rgba(232,237,242,0.45);
+      transition: opacity 0.25s ease, border-color 0.25s ease, background-color 0.25s ease;
+    }
+
+    /* Over anything clickable: circle grows and turns orange, + turns a quarter */
+    .vx-cursor-hover .vx-ring { border-color: var(--accent); background-color: rgba(234,118,0,0.10); }
+    .vx-cursor-hover .vx-plus { color: var(--accent); }
+    .vx-cursor-hover .vx-plus svg { transform: rotate(90deg); }
+
+    /* Over orange buttons: switch to white so the cursor doesn't disappear */
+    .vx-cursor-on-accent .vx-ring { border-color: var(--text); background-color: rgba(255,255,255,0.12); }
+    .vx-cursor-on-accent .vx-plus { color: var(--text); }
+
+    /* Over the video: circle tightens so the controls stay easy to hit */
+    .vx-cursor-media .vx-ring { border-color: rgba(232,237,242,0.3); }
+
+    /* In text fields: hide it and use the normal text cursor */
+    .vx-cursor-text .vx-plus, .vx-cursor-text .vx-ring,
+    .vx-cursor-out .vx-plus, .vx-cursor-out .vx-ring { opacity: 0 !important; }
   </style>
 </head>
 <body>
+<!-- Interactive cursor (added by JS only on mouse/trackpad devices) -->
+<div class="vx-ring" aria-hidden="true"></div>
+<div class="vx-plus" aria-hidden="true">
+  <svg viewBox="0 0 22 22"><path class="outline" d="M11 1v7M11 14v7M1 11h7M14 11h7" stroke-linecap="square"/><path class="line" d="M11 1v7M11 14v7M1 11h7M14 11h7" stroke-linecap="square"/></svg>
+</div>
 
 <div class="grid-bg"></div>
 
@@ -1040,12 +1170,29 @@
 
 <!-- VIDEO - Demo First -->
 <section class="demo-section" id="demo">
-  <div class="video-label reveal">Demo</div>
+  <!-- Demo carousel: one title line, arrows beside the video -->
+  <div class="demo-head reveal">
+    <p class="demo-title" id="demoTitle" aria-live="polite">Vexa Pro walkthrough</p>
+  </div>
+
+  <div class="demo-stage">
+  <button class="demo-arrow demo-arrow--prev" id="demoPrev" aria-label="Previous video" disabled></button>
+  <button class="demo-arrow demo-arrow--next" id="demoNext" aria-label="Next video: Exporting a report"></button>
   <div class="video-wrapper reveal">
     <div class="viewport-corners"></div>
-    <video class="demo-video" id="demoVideo" controls playsinline preload="metadata" aria-label="Vexa demo: checking and fixing an asset in Blender">
-      <source src="/demo.mp4#t=0.1" type="video/mp4">
-    </video>
+    <div class="demo-track" id="demoTrack">
+      <div class="demo-slide" aria-label="Video 1 of 2">
+        <video class="demo-video" controls playsinline preload="metadata" aria-label="Vexa Pro walkthrough">
+          <source src="/demo.mp4#t=0.1" type="video/mp4">
+        </video>
+      </div>
+      <div class="demo-slide" aria-label="Video 2 of 2" aria-hidden="true">
+        <video class="demo-video" controls playsinline preload="metadata" aria-label="Exporting a report" tabindex="-1">
+          <source src="/demo-report.mp4#t=0.1" type="video/mp4">
+        </video>
+      </div>
+    </div>
+  </div>
   </div>
 </section>
 
@@ -1260,7 +1407,54 @@
   }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
   animated.forEach(el => io.observe(el));
 
-  // Video now uses native HTML5 controls
+  // Demo carousel
+  (function () {
+    const slides = [...document.querySelectorAll('.demo-slide')];
+    const videos = slides.map(s => s.querySelector('video'));
+    const titles = ['Vexa Pro walkthrough', 'Exporting a report'];
+    const track = document.getElementById('demoTrack');
+    const title = document.getElementById('demoTitle');
+    const prev = document.getElementById('demoPrev');
+    const next = document.getElementById('demoNext');
+    let current = 0;
+
+    function go(i, autoplay = false) {
+      if (i < 0 || i >= slides.length || i === current) return;
+      videos[current].pause();
+      current = i;
+      track.style.transform = `translateX(-${i * 100}%)`;
+      slides.forEach((s, n) => {
+        s.setAttribute('aria-hidden', n !== i);
+        videos[n].tabIndex = n === i ? 0 : -1;
+      });
+      prev.disabled = i === 0;
+      next.disabled = i === slides.length - 1;
+      if (!prev.disabled) prev.setAttribute('aria-label', 'Previous video: ' + titles[i - 1]);
+      if (!next.disabled) next.setAttribute('aria-label', 'Next video: ' + titles[i + 1]);
+      title.classList.add('swap');
+      setTimeout(() => { title.textContent = titles[i]; title.classList.remove('swap'); }, 250);
+      if (autoplay) videos[i].play().catch(() => {});
+    }
+
+    prev.addEventListener('click', () => go(current - 1));
+    next.addEventListener('click', () => go(current + 1));
+
+    // When the walkthrough finishes, roll straight into the report video
+    videos.forEach((v, i) => v.addEventListener('ended', () => go(i + 1, true)));
+
+    // Chrome sizes native video controls while a slide is off-screen and doesn't
+    // redo it after sliding in; re-attaching the controls makes it lay them out again.
+    track.addEventListener('transitionend', e => {
+      if (e.target !== track) return;
+      const v = videos[current];
+      v.removeAttribute('controls'); void v.offsetWidth; v.setAttribute('controls', '');
+    });
+
+    // Nudge the next arrow a few times when the demo first scrolls into view
+    new IntersectionObserver((entries, obs) => {
+      if (entries[0].isIntersecting) { next.classList.add('hint'); obs.disconnect(); }
+    }, { threshold: 0.5 }).observe(track);
+  })();
 
   // Stat count-up
   const counters = document.querySelectorAll('.stat-n .count');
@@ -1305,6 +1499,20 @@
     }, { threshold: 0.5 });
     stepsIO.observe(stepsTrack);
   }
+
+  // In-page links (#features, #waitlist...): scroll smoothly but keep the address bar clean,
+  // so the URL doesn't stay stuck on #waitlist while you scroll around.
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const id = a.getAttribute('href');
+      const target = id.length > 1 && document.querySelector(id);
+      if (!target) return;
+      e.preventDefault();
+      const smooth = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      target.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'start' });
+      history.replaceState(null, '', location.pathname + location.search);
+    });
+  });
 
   // Hamburger menu
   const hamburger = document.getElementById('hamburger');
@@ -1363,6 +1571,70 @@
       }
     });
   });
+
+  // Interactive cursor
+  (function () {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    const root = document.documentElement;
+    const plus = document.querySelector('.vx-plus');
+    const ring = document.querySelector('.vx-ring');
+    if (!plus || !ring) return;
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let mx = -100, my = -100;          // mouse
+    let rx = -100, ry = -100;          // ring (lags behind)
+    let scale = 1, targetScale = 1;
+    let hover = false, down = false, media = false;
+    let running = false;
+
+    const CLICKABLE = 'a, button, label, summary, [role="tab"], .demo-arrow, .wl-chips label';
+
+    function setTarget() {
+      targetScale = (hover ? 1.7 : media ? 0.55 : 1) * (down ? 0.72 : 1);
+    }
+
+    function frame() {
+      const k = still ? 1 : 0.2;
+      const dx = mx - rx, dy = my - ry;
+      rx += dx * k; ry += dy * k;
+      scale += (targetScale - scale) * (still ? 1 : 0.18);
+
+      // Stretch the circle a little in the direction of movement
+      const speed = Math.hypot(dx, dy);
+      const stretch = still ? 0 : Math.min(speed / 90, 0.35);
+      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+      plus.style.transform = `translate3d(${mx}px, ${my}px, 0) scale(${down ? 0.85 : 1})`;
+      ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) rotate(${angle}deg) scale(${scale * (1 + stretch)}, ${scale * (1 - stretch * 0.5)})`;
+
+      if (speed > 0.1 || Math.abs(targetScale - scale) > 0.002) requestAnimationFrame(frame);
+      else running = false;
+    }
+    function kick() { if (!running) { running = true; requestAnimationFrame(frame); } }
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      if (!root.classList.contains('has-vx-cursor')) { rx = mx; ry = my; root.classList.add('has-vx-cursor'); }
+      root.classList.remove('vx-cursor-out');
+      kick();
+    }, { passive: true });
+
+    document.addEventListener('mouseover', e => {
+      const t = e.target;
+      hover = !!t.closest(CLICKABLE) && !t.closest('button:disabled');
+      media = !hover && !!t.closest('video');
+      root.classList.toggle('vx-cursor-hover', hover);
+      root.classList.toggle('vx-cursor-media', media);
+      root.classList.toggle('vx-cursor-on-accent', hover && !!t.closest('.btn-primary, .nav-cta, .mobile-cta'));
+      root.classList.toggle('vx-cursor-text', !!t.closest('input[type="email"], input[type="text"], textarea'));
+      setTarget(); kick();
+    });
+
+    document.addEventListener('mousedown', () => { down = true; setTarget(); kick(); });
+    document.addEventListener('mouseup', () => { down = false; setTarget(); kick(); });
+    document.addEventListener('mouseleave', () => root.classList.add('vx-cursor-out'));
+    window.addEventListener('blur', () => root.classList.add('vx-cursor-out'));
+  })();
 
   // Waitlist form
   const FORM_ENDPOINT = "https://formspree.io/f/mljjldda";
